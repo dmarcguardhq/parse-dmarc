@@ -6,6 +6,7 @@ import (
 	"crypto/x509"
 	"fmt"
 	"io"
+	"mime"
 	"os"
 	"strings"
 
@@ -288,13 +289,28 @@ func (c *Client) collectAttachments(r io.Reader, depth int) []Attachment {
 			break
 		}
 
-		h, ok := part.Header.(*mail.AttachmentHeader)
-		if !ok {
+		// Reports do not always arrive as a formal attachment: Fastmail
+		// sends its aggregate reports with Content-Disposition: inline,
+		// which go-message surfaces as *mail.InlineHeader. An inline part
+		// may legitimately carry a filename, so take both header types and
+		// leave the decision to isDMARCAttachment below.
+		var filename, contentType string
+		switch h := part.Header.(type) {
+		case *mail.AttachmentHeader:
+			filename, _ = h.Filename()
+			contentType, _, _ = h.ContentType()
+		case *mail.InlineHeader:
+			var ctParams map[string]string
+			contentType, ctParams, _ = h.ContentType()
+			if _, params, err := mime.ParseMediaType(h.Get("Content-Disposition")); err == nil {
+				filename = params["filename"]
+			}
+			if filename == "" {
+				filename = ctParams["name"]
+			}
+		default:
 			continue
 		}
-
-		filename, _ := h.Filename()
-		contentType, _, _ := h.ContentType()
 
 		data, err := io.ReadAll(part.Body)
 		if err != nil {

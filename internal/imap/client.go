@@ -316,6 +316,11 @@ func (c *Client) collectAttachments(r io.Reader, depth int) []Attachment {
 
 		if isDMARCAttachment(filename, data) {
 			attachments = append(attachments, Attachment{Filename: filename, Data: data})
+		} else {
+			c.log.Debug().
+				Str("filename", filename).
+				Str("content_type", contentType).
+				Msg("skipping attachment that does not look like a DMARC report")
 		}
 	}
 

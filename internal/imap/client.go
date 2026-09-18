@@ -6,7 +6,6 @@ import (
 	"crypto/x509"
 	"fmt"
 	"io"
-	"mime"
 	"os"
 	"strings"
 
@@ -291,24 +290,32 @@ func (c *Client) collectAttachments(r io.Reader, depth int) []Attachment {
 
 		// Reports do not always arrive as a formal attachment: Fastmail
 		// sends its aggregate reports with Content-Disposition: inline,
-		// which go-message surfaces as *mail.InlineHeader. An inline part
-		// may legitimately carry a filename, so take both header types and
-		// leave the decision to isDMARCAttachment below.
-		var filename, contentType string
-		switch h := part.Header.(type) {
+		// which go-message surfaces as *mail.InlineHeader (it uses the
+		// same type for text/* parts with no disposition at all). Both
+		// types wrap a message.Header, and AttachmentHeader.Filename
+		// already reads the disposition filename with a Content-Type name
+		// fallback, so wrap the inline header and leave the decision to
+		// isDMARCAttachment below.
+		var h *mail.AttachmentHeader
+		inline := false
+		switch ph := part.Header.(type) {
 		case *mail.AttachmentHeader:
-			filename, _ = h.Filename()
-			contentType, _, _ = h.ContentType()
+			h = ph
 		case *mail.InlineHeader:
-			var ctParams map[string]string
-			contentType, ctParams, _ = h.ContentType()
-			if _, params, err := mime.ParseMediaType(h.Get("Content-Disposition")); err == nil {
-				filename = params["filename"]
-			}
-			if filename == "" {
-				filename = ctParams["name"]
-			}
+			h = &mail.AttachmentHeader{Header: ph.Header}
+			inline = true
 		default:
+			continue
+		}
+
+		filename, _ := h.Filename()
+		contentType, _, _ := h.ContentType()
+
+		// An unnamed inline text part is the human-readable body of the
+		// mail, not a report. Skip it before reading so a large HTML body
+		// is neither buffered nor content-sniffed: a body that merely
+		// quotes "<feedback" must not turn into an attachment.
+		if inline && filename == "" && strings.HasPrefix(strings.ToLower(contentType), "text/") {
 			continue
 		}
 

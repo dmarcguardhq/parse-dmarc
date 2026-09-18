@@ -113,9 +113,16 @@ func (c *Client) Disconnect() error {
 
 // Report represents a DMARC report email
 type Report struct {
-	Subject     string
-	From        string
-	Date        string
+	Subject string
+	From    string
+	Date    string
+	// MessageID is the RFC 5322 Message-ID from the IMAP envelope: the one
+	// key that finds the mail again on any server (SEARCH HEADER
+	// Message-ID, doveadm search, Gmail's rfc822msgid:) and in the MTA log.
+	MessageID string
+	// UID is the message's IMAP UID in the fetched mailbox. It is only
+	// stable there: a move to the processed mailbox assigns a new one.
+	UID         uint32
 	Attachments []Attachment
 }
 
@@ -167,7 +174,7 @@ func (c *Client) FetchDMARCReports() (*FetchResult, error) {
 	done := make(chan error, 1)
 
 	section := &imap.BodySectionName{Peek: !c.config.MarkAsSeen}
-	items := []imap.FetchItem{section.FetchItem(), imap.FetchEnvelope, imap.FetchFlags}
+	items := []imap.FetchItem{section.FetchItem(), imap.FetchEnvelope, imap.FetchFlags, imap.FetchUid}
 
 	go func() {
 		done <- c.client.Fetch(seqSet, items, messages)
@@ -186,8 +193,10 @@ func (c *Client) FetchDMARCReports() (*FetchResult, error) {
 		}
 
 		report := Report{
-			Subject: msg.Envelope.Subject,
-			Date:    msg.Envelope.Date.String(),
+			Subject:   msg.Envelope.Subject,
+			Date:      msg.Envelope.Date.String(),
+			MessageID: msg.Envelope.MessageId,
+			UID:       msg.Uid,
 		}
 
 		if len(msg.Envelope.From) > 0 {
@@ -198,12 +207,17 @@ func (c *Client) FetchDMARCReports() (*FetchResult, error) {
 
 		// A message without a recognized report is still marked seen and
 		// moved with the rest of the batch, so this line is the only trace
-		// that a sender's report went unrecognized.
+		// that a sender's report went unrecognized. message_id finds it
+		// again anywhere; uid only until the batch is moved.
 		if len(report.Attachments) == 0 {
 			c.log.Warn().
-				Uint32("seqnum", msg.SeqNum).
+				Str("message_id", report.MessageID).
+				Uint32("uid", report.UID).
+				Str("mailbox", c.config.Mailbox).
+				Str("processed_mailbox", c.config.ProcessedMailbox).
 				Str("from", report.From).
 				Str("subject", report.Subject).
+				Time("date", msg.Envelope.Date).
 				Msg("no DMARC report attachment in message; it is marked seen or moved with the batch all the same")
 			continue
 		}

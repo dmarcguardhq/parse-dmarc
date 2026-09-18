@@ -184,7 +184,11 @@ func fetchReports(cfg *config.Config, store *storage.Storage, m *metrics.Metrics
 
 			feedback, err := parser.ParseReport(attachment.Data)
 			if err != nil {
-				log.Warn().Err(err).Str("filename", attachment.Filename).Msg("failed to parse report")
+				log.Warn().Err(err).
+					Str("filename", attachment.Filename).
+					Str("message_id", report.MessageID).
+					Str("from", report.From).
+					Msg("failed to parse report")
 				if m != nil {
 					m.ReportParseErrors.Inc()
 				}
@@ -195,7 +199,10 @@ func fetchReports(cfg *config.Config, store *storage.Storage, m *metrics.Metrics
 			}
 
 			if err := store.SaveReport(feedback); err != nil {
-				log.Error().Err(err).Str("report_id", feedback.ReportMetadata.ReportID).Msg("failed to save report")
+				log.Error().Err(err).
+					Str("report_id", feedback.ReportMetadata.ReportID).
+					Str("message_id", report.MessageID).
+					Msg("failed to save report")
 				if m != nil {
 					m.ReportStoreErrors.Inc()
 				}
@@ -207,6 +214,7 @@ func fetchReports(cfg *config.Config, store *storage.Storage, m *metrics.Metrics
 
 			log.Info().
 				Str("report_id", feedback.ReportMetadata.ReportID).
+				Str("message_id", report.MessageID).
 				Str("org", feedback.ReportMetadata.OrgName).
 				Str("domain", feedback.PolicyPublished.Domain).
 				Int("messages", feedback.GetTotalMessages()).

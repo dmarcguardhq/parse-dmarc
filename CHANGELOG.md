@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.7.0](https://github.com/dmarcguardhq/parse-dmarc/compare/v1.6.1...v1.7.0) (2026-09-18)
+
+
+### Features
+
+* log attachments rejected as non-DMARC ([#208](https://github.com/dmarcguardhq/parse-dmarc/issues/208)) ([31b6a23](https://github.com/dmarcguardhq/parse-dmarc/commit/31b6a230fe56c749296dcac7b487675651b852a6))
+
+
+### Bug Fixes
+
+* accept DMARC reports sent as inline MIME parts ([#207](https://github.com/dmarcguardhq/parse-dmarc/issues/207)) ([20b2be0](https://github.com/dmarcguardhq/parse-dmarc/commit/20b2be03d8a43197eabde63eff452e276eaf2b63))
+* **docs:** update brew installation ref ([d62606e](https://github.com/dmarcguardhq/parse-dmarc/commit/d62606e99b80c5eddfe1b2d33c5aaed2631ee0aa))
+
+
+### Chores
+
+* **docs:** publish brew to the new org-wide repository ([432f010](https://github.com/dmarcguardhq/parse-dmarc/commit/432f010856838969b99a078339d72830421a9678))
+
 ## [1.6.1](https://github.com/dmarcguardhq/parse-dmarc/compare/v1.6.0...v1.6.1) (2026-09-15)
 
 

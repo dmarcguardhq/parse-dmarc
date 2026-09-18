@@ -196,10 +196,18 @@ func (c *Client) FetchDMARCReports() (*FetchResult, error) {
 
 		report.Attachments = c.collectAttachments(r, 0)
 
-		// Only add reports with attachments
-		if len(report.Attachments) > 0 {
-			reports = append(reports, report)
+		// A message without a recognized report is still marked seen and
+		// moved with the rest of the batch, so this line is the only trace
+		// that a sender's report went unrecognized.
+		if len(report.Attachments) == 0 {
+			c.log.Warn().
+				Uint32("seqnum", msg.SeqNum).
+				Str("from", report.From).
+				Str("subject", report.Subject).
+				Msg("no DMARC report attachment in message; it is marked seen or moved with the batch all the same")
+			continue
 		}
+		reports = append(reports, report)
 	}
 
 	if err := <-done; err != nil {

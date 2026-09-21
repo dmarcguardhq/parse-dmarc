@@ -148,6 +148,23 @@ homebrew_casks:
           puts "📚 For more information and usage instructions, visit:"
           puts "   https://github.com/dmarcguardhq/parse-dmarc"
 
+nix:
+  # Binary package for Nix users, same model as the brew tap: goreleaser
+  # renders pkgs/parse-dmarc/default.nix (fetchurl of the release archives +
+  # per-platform sha256) into dmarcguardhq/nur, whose flake.nix exposes it as
+  # `nix run github:dmarcguardhq/nur#parse-dmarc`. Needs nix-hash on PATH
+  # (install-nix-action in ci.yml); without it the pipe is skipped, not failed.
+  - name: parse-dmarc
+    repository:
+      owner: dmarcguardhq
+      name: nur
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+    homepage: https://github.com/dmarcguardhq/parse-dmarc
+    description: Single-binary, zero-dependency DMARC parser with a modern web dashboard.
+    license: asl20
+    commit_msg_template: Nix package update for {{ .ProjectName }} version {{ .Tag }}
+    extra_install: installShellCompletion --cmd parse-dmarc --bash <($out/bin/parse-dmarc completion bash) --zsh <($out/bin/parse-dmarc completion zsh) --fish <($out/bin/parse-dmarc completion fish)
+
 report_sizes: true
 
 release:

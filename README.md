@@ -69,6 +69,12 @@ parse-dmarc --gen-config          # writes a config.json template
 parse-dmarc --config config.json
 ```
 
+Nix, from our [NUR-style repo](https://github.com/dmarcguardhq/nur):
+
+```bash
+nix profile install github:dmarcguardhq/nur#parse-dmarc   # or: nix run github:dmarcguardhq/nur#parse-dmarc
+```
+
 Or download a release archive, `parse-dmarc_<os>_<arch>.tar.gz`, from the [releases page](https://github.com/dmarcguardhq/parse-dmarc/releases).
 
 Open http://localhost:8080. Gmail needs an [App Password](https://support.google.com/accounts/answer/185833), not the account password. The same image is on Docker Hub as `meysam81/parse-dmarc`; both names track the same builds, and tags such as `v1` or `v1.6.0` pin a release.

@@ -25,6 +25,12 @@ Also on Docker Hub as `dmarcguard/{{ .ProjectName }}:{{ .Tag }}`.
 brew install {{ $owner }}/tap/{{ .ProjectName }}
 ```
 
+**Nix**
+
+```bash
+nix profile install github:{{ $owner }}/nur#{{ .ProjectName }}   # or: nix run github:{{ $owner }}/nur#{{ .ProjectName }}
+```
+
 **Binary** (swap `linux_amd64` for your platform; see the assets below)
 
 ```bash

@@ -150,6 +150,13 @@ homebrew_casks:
 
 report_sizes: true
 
+release:
+  # release-please creates the GitHub release with the changelog; goreleaser
+  # appends the install/verify footer rendered from .github/release-notes.md
+  # (passed via --release-notes-tmpl in ci.yml, which bypasses the changelog
+  # pipe so nothing is duplicated).
+  mode: append
+
 milestones:
   - close: true
     fail_on_error: false

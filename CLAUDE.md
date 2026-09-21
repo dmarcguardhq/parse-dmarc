@@ -384,6 +384,7 @@ See `parse-dmarc.service` for systemd service configuration.
 - Release automation via release-please and goreleaser
 - Multi-platform Docker images (amd64, arm64)
 - Lockfile: bun.lock only (Docker + CI use `bun install --frozen-lockfile`). package-lock.json was removed so Renovate updates bun.lock; do not reintroduce it.
+- GitHub release notes footer (install/verify commands) lives in `.github/release-notes.md`, a goreleaser template passed via `--release-notes-tmpl` in `build-prod` with `release.mode: append`. release-please `pull-request-footer` only affects the release PR body, never the GitHub release. Templates use `missingkey=error`: an unknown `{{ .Field }}` fails the release, so render-check after editing.
 
 ## Roadmap
 

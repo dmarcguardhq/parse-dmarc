@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.7.1](https://github.com/dmarcguardhq/parse-dmarc/compare/v1.7.0...v1.7.1) (2026-09-21)
+
+
+### Features
+
+* **ci:** publish a Nix package to dmarcguardhq/nur on release ([#211](https://github.com/dmarcguardhq/parse-dmarc/issues/211)) ([d24c446](https://github.com/dmarcguardhq/parse-dmarc/commit/d24c446757f7fc09a7cb494a620deb6b42f355c4))
+
+
+### Chores
+
+* **ci:** append installation footer to GitHub release notes ([#210](https://github.com/dmarcguardhq/parse-dmarc/issues/210)) ([27bc537](https://github.com/dmarcguardhq/parse-dmarc/commit/27bc537c2329e526536fca862941b3792a5a94a4))
+* **deps:** lock file maintenance ([#209](https://github.com/dmarcguardhq/parse-dmarc/issues/209)) ([cb4a8b8](https://github.com/dmarcguardhq/parse-dmarc/commit/cb4a8b8ca6b5323aa80dd199a9e196de23e9f203))
+
 ## [1.7.0](https://github.com/dmarcguardhq/parse-dmarc/compare/v1.6.1...v1.7.0) (2026-09-18)
 
 

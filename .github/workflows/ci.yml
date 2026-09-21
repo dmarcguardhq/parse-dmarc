@@ -193,7 +193,7 @@ jobs:
         with:
           distribution: goreleaser
           version: "~> v2"
-          args: release --clean
+          args: release --clean --release-notes-tmpl .github/release-notes.md
         env:
           BUILDKIT_MULTI_PLATFORM: "${{ vars.BUILDKIT_MULTI_PLATFORM }}"
           DISABLE_SBOM: "${{ vars.DISABLE_SBOM }}"

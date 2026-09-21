@@ -19,45 +19,6 @@
     {
       formatter = forAllSystems (pkgs: pkgs.nixfmt);
 
-      packages = forAllSystems (
-        pkgs:
-        let
-          frontend = pkgs.buildNpmPackage {
-            pname = "parse-dmarc-frontend";
-            version = "0.0.0-dev";
-            src = ./.;
-            npmDepsHash = "sha256-6QQi2bqDx/AqMcBkNghcxYmqdYm+gdLq0YJkyudf7XQ=";
-            nativeBuildInputs = with pkgs; [ python3 ];
-            buildPhase = ''
-              runHook preBuild
-              npx vite build
-              runHook postBuild
-            '';
-            installPhase = ''
-              runHook preInstall
-              cp -r dist $out
-              runHook postInstall
-            '';
-          };
-        in
-        {
-          default = pkgs.buildGoModule {
-            pname = "parse-dmarc";
-            version = "0.0.0-dev";
-            src = ./.;
-            vendorHash = "sha256-ojwyblK05W0O4GVVzKvsAfMc+EVWWBjn4F7RsT5S0/o=";
-            env.CGO_ENABLED = 0;
-            preBuild = ''
-              cp -r ${frontend} internal/api/dist
-            '';
-            meta = {
-              description = "DMARC report parser and dashboard";
-              mainProgram = "parse-dmarc";
-            };
-          };
-        }
-      );
-
       devShells = forAllSystems (pkgs: {
         default = pkgs.mkShell {
           packages =

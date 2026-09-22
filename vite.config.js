@@ -9,6 +9,7 @@ var __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
   publicDir: path.resolve(__dirname, "./assets"),
+  base: "./",
   plugins: [
     vue(),
     createHtmlPlugin({

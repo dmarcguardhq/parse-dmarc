@@ -27,7 +27,7 @@ function getDefaultApiUrl() {
   if (import.meta.env.DEV) {
     return "http://localhost:8080/api";
   }
-  return `${window.location.origin}/api`;
+  return `${window.location.origin}${window.location.pathname}api`;
 }
 
 /**

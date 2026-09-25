@@ -186,6 +186,8 @@ Run Parse DMARC when you want the data on your own disk and one mailbox to watch
 
 [Start free on 2 domains, no credit card](https://dmarcguard.io/pricing/?utm_source=github&utm_medium=referral&utm_campaign=parse-dmarc-readme&utm_content=which-one)
 
+Moving to Pro from here? Code `GITHUB5` takes an extra 5% off your first 3 months, for the first 5 accounts that use it.
+
 ## Roadmap and contributing
 
 The three most-asked additions, in the order people ask: TLS-RPT reports ([#154](https://github.com/dmarcguardhq/parse-dmarc/issues/154)), a Maildir or directory intake for people without IMAP ([#169](https://github.com/dmarcguardhq/parse-dmarc/issues/169)), and whois on sending sources ([#143](https://github.com/dmarcguardhq/parse-dmarc/issues/143)). [ROADMAP.md](ROADMAP.md) has the rest. [CONTRIBUTING.md](CONTRIBUTING.md) covers the toolchain: `just build`, `just dev`, and `docker compose up` for a local Dovecot seeded with a sample report.

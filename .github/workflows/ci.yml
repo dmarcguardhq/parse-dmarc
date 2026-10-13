@@ -4,16 +4,25 @@ on:
   pull_request:
     branches:
       - main
+  # The merge queue (main ruleset): GitHub tests the exact commit that will
+  # land, on a gh-readonly-queue/main/* ref, and merges only when `ci-gate`
+  # passes there. That run is the gate; the push to main that follows only
+  # builds the image and releases.
+  merge_group:
   push:
     branches:
       - main
 
 jobs:
+  # Check only, never a fix-up commit: a commit pushed with the workflow
+  # token starts no workflow, so the PR head it creates would never report
+  # `ci-gate` and could not be queued. Fix locally with `bunx prettier -w .`
+  # (the pre-commit hook runs it).
   prettier:
+    if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
     runs-on: ubuntu-latest
     permissions:
-      contents: write
-      pull-requests: write
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -24,28 +33,10 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
       - name: Run Prettier
-        run: bunx prettier -w .
-      - name: Commit if changed
-        if: github.event_name == 'pull_request'
-        env:
-          HEAD_REF: ${{ github.head_ref }}
-        run: |
-          if [[ -n "$(git status --porcelain)" ]]; then
-            echo "The following files were changed by prettier:"
-            git status --porcelain
-
-            git config user.name "github-actions[bot]"
-            git config user.email "${{ github.actor_id }}+github-actions@users.noreply.github.com"
-            git add .
-            git commit -m "chore: format code with prettier" -m 'skip ci'
-            git fetch origin "$HEAD_REF"
-            git rebase "origin/$HEAD_REF"
-            git push origin "HEAD:$HEAD_REF"
-          else
-            echo "No changes to commit"
-          fi
+        run: bunx prettier --check .
 
   checks:
+    if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
     permissions:
       contents: read
       pull-requests: read
@@ -64,8 +55,28 @@ jobs:
       - name: golangci-lint
         uses: golangci/golangci-lint-action@ba0d7d2ec06a0ea1cb5fa41b2e4a3ab91d21278a # v9
 
+  test:
+    if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: Setup Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7
+        with:
+          go-version-file: ./go.mod
+      - name: Create dist
+        run: |
+          mkdir -p internal/api/dist
+          echo '<h1>Parse-DMARC API</h1>' > internal/api/dist/index.html
+      - name: Go test
+        run: go test -race -count=1 ./...
+
+  # PR and merge group only: the queue built the commit the push lands.
   simulate-prod:
-    if: github.event_name == 'push' || github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -96,6 +107,34 @@ jobs:
           args: release --clean --snapshot
         env:
           GITHUB_TOKEN: ${{ github.token }}
+
+  # The ONE required status check on main (ruleset), on the PR and on the
+  # merge group alike, so adding or renaming a job never touches the
+  # ruleset: list it under needs: here. A skipped job passes; failure and
+  # cancelled fail the gate. always(), never !cancelled(): GitHub counts a
+  # SKIPPED required check as passing, so a gate that could be skipped
+  # would let a cancelled merge group land untested.
+  ci-gate:
+    if: always() && (github.event_name == 'pull_request' || github.event_name == 'merge_group')
+    needs:
+      - prettier
+      - checks
+      - test
+      - simulate-prod
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    permissions: {}
+    steps:
+      - name: Every needed job passed or was skipped
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+        run: |
+          bad=$(jq -r 'to_entries[] | select(.value.result != "success" and .value.result != "skipped") | "\(.key)=\(.value.result)"' <<<"$NEEDS")
+          if [ -n "$bad" ]; then
+            echo "::error::ci-gate: ${bad//$'\n'/ }"
+            exit 1
+          fi
+          jq -r 'to_entries[] | "\(.key)=\(.value.result)"' <<<"$NEEDS"
 
   build-docker:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'

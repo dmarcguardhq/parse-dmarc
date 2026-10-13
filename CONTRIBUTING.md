@@ -54,7 +54,8 @@ go run . --config config.dev.json   # fetch from that fixture
 
 - One change per PR, with a test when the change has logic in it.
 - Conventional Commits in the title (`feat:`, `fix:`, `docs:`); release-please builds the changelog from them.
-- `bunx prettier -w .` before pushing; CI runs it and commits the diff otherwise.
+- `bunx prettier -w .` before pushing; CI checks it and fails on any diff.
+- `main` merges through a merge queue: once `ci-gate` is green and the PR is approved, a maintainer queues it, and CI runs again on the exact commit that lands.
 - Update the README or `docs/` when you change a flag, an env var, a metric or a tool.
 
 ## Open asks

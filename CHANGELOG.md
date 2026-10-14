@@ -1,5 +1,30 @@
 # Changelog
 
+## [1.7.1](https://github.com/dmarcguardhq/parse-dmarc/compare/v1.7.0...v1.7.1) (2026-10-14)
+
+
+### Features
+
+* **ci:** publish a Nix package to dmarcguardhq/nur on release ([#211](https://github.com/dmarcguardhq/parse-dmarc/issues/211)) ([d24c446](https://github.com/dmarcguardhq/parse-dmarc/commit/d24c446757f7fc09a7cb494a620deb6b42f355c4))
+* **maildir:** read reports from a local Maildir ([#217](https://github.com/dmarcguardhq/parse-dmarc/issues/217)) ([3f2fd5a](https://github.com/dmarcguardhq/parse-dmarc/commit/3f2fd5a33b4e43eff59f77d1a95679ce4101b4d6))
+
+
+### Build & Dependencies
+
+* **deps:** update module github.com/goccy/go-json to v0.11.1 ([#215](https://github.com/dmarcguardhq/parse-dmarc/issues/215)) ([376cc30](https://github.com/dmarcguardhq/parse-dmarc/commit/376cc307467c34dc2fbcd176fc707622f56c1add))
+* **deps:** update module github.com/modelcontextprotocol/go-sdk to v1.8.0 ([#199](https://github.com/dmarcguardhq/parse-dmarc/issues/199)) ([1a17480](https://github.com/dmarcguardhq/parse-dmarc/commit/1a1748013aa30b4fcaadae9b54f09c4ece62f188))
+* **deps:** update module github.com/urfave/cli/v3 to v3.13.0 ([#200](https://github.com/dmarcguardhq/parse-dmarc/issues/200)) ([679c0b4](https://github.com/dmarcguardhq/parse-dmarc/commit/679c0b46c801651c1b2613b46634de21329417c3))
+* **deps:** update module modernc.org/sqlite to v1.60.1 ([#204](https://github.com/dmarcguardhq/parse-dmarc/issues/204)) ([b87bdcd](https://github.com/dmarcguardhq/parse-dmarc/commit/b87bdcd11adfe3df0800e1bc76387be8c72679ff))
+* **deps:** update non-major dependencies ([#203](https://github.com/dmarcguardhq/parse-dmarc/issues/203)) ([a823154](https://github.com/dmarcguardhq/parse-dmarc/commit/a82315441356744773d26a3ed2d52eb8243ecf9c))
+
+
+### Chores
+
+* **ci:** append installation footer to GitHub release notes ([#210](https://github.com/dmarcguardhq/parse-dmarc/issues/210)) ([27bc537](https://github.com/dmarcguardhq/parse-dmarc/commit/27bc537c2329e526536fca862941b3792a5a94a4))
+* **ci:** merge main through a merge queue gated by ci-gate ([#216](https://github.com/dmarcguardhq/parse-dmarc/issues/216)) ([3faa76b](https://github.com/dmarcguardhq/parse-dmarc/commit/3faa76b5a2da78bf5d9fccd5afb3cda71273a146))
+* **deps:** lock file maintenance ([#209](https://github.com/dmarcguardhq/parse-dmarc/issues/209)) ([cb4a8b8](https://github.com/dmarcguardhq/parse-dmarc/commit/cb4a8b8ca6b5323aa80dd199a9e196de23e9f203))
+* **deps:** lock file maintenance ([#214](https://github.com/dmarcguardhq/parse-dmarc/issues/214)) ([530956f](https://github.com/dmarcguardhq/parse-dmarc/commit/530956ff7407af0938776b451c5941bc2777e0d8))
+
 ## [1.7.0](https://github.com/dmarcguardhq/parse-dmarc/compare/v1.6.1...v1.7.0) (2026-09-18)
 
 

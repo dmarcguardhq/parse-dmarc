@@ -27,6 +27,7 @@ cmd/server/          CLI flags and the run loop
 internal/api/        HTTP server, embeds the built frontend from internal/api/dist
 internal/config/     config.json and environment parsing
 internal/imap/       IMAP client, attachment unwrapping
+internal/maildir/    local Maildir intake (new/ -> cur/)
 internal/mcp/        MCP server and tools
 internal/metrics/    Prometheus metrics
 internal/parser/     aggregate report XML parser
@@ -60,7 +61,7 @@ go run . --config config.dev.json   # fetch from that fixture
 
 ## Open asks
 
-In the order people ask: TLS-RPT reports (#154), Maildir or directory intake (#169), whois on sending sources (#143). Then, from ROADMAP.md: failure reports (RUF), CSV and JSON export, alerting.
+In the order people ask: TLS-RPT reports (#154), whois on sending sources (#143). Then, from ROADMAP.md: failure reports (RUF), CSV and JSON export, alerting.
 
 ## License
 

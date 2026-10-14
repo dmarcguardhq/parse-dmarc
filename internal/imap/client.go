@@ -283,6 +283,13 @@ func (c *Client) MoveMessages(messageIDs []uint32, destMailbox string) error {
 // maxNestDepth bounds recursion into forwarded/embedded messages.
 const maxNestDepth = 4
 
+// CollectAttachments walks a raw MIME message and returns the DMARC report
+// attachments in it. It is exported for the Maildir intake, which holds whole
+// messages on disk instead of an IMAP body.
+func CollectAttachments(log *zerolog.Logger, r io.Reader) []Attachment {
+	return (&Client{log: log}).collectAttachments(r, 0)
+}
+
 // collectAttachments walks a MIME message and returns DMARC report attachments,
 // descending into embedded messages (Google reports relayed through Exchange or
 // Outlook arrive as a message/rfc822 attachment wrapping the real .zip).

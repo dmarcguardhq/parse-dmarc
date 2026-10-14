@@ -27,6 +27,8 @@ parse-dmarc/
 │   │   └── config.go          # Config loading and validation
 │   ├── imap/                  # IMAP client for fetching emails
 │   │   └── client.go          # Email fetching logic
+│   ├── maildir/               # Local Maildir intake (new/ -> cur/)
+│   │   └── maildir.go         # Maildir message reading
 │   ├── logger/                # Structured logging setup
 │   │   └── logger.go          # Zerolog configuration
 │   ├── mcp/                   # MCP (Model Context Protocol) server
@@ -217,7 +219,8 @@ go test -v ./internal/parser/...
 - `internal/api/server.go` - HTTP server, API routes, metrics middleware
 - `internal/config/config.go` - Configuration loading (JSON + env vars)
 - `internal/parser/dmarc.go` - DMARC XML parsing (gzip, zip, raw XML)
-- `internal/imap/client.go` - IMAP email fetching
+- `internal/imap/client.go` - IMAP email fetching, MIME attachment unwrapping
+- `internal/maildir/maildir.go` - local Maildir intake
 - `internal/storage/common.go` - SQL queries, data types
 - `internal/mcp/server.go` - MCP server implementation
 - `internal/mcp/tools.go` - MCP tool handlers
@@ -317,6 +320,9 @@ Config via JSON file or environment variables (using caarlos0/env):
     "mark_as_seen": true,
     "processed_mailbox": ""
   },
+  "maildir": {
+    "path": ""
+  },
   "database": {
     "path": "~/.parse-dmarc/db.sqlite"
   },
@@ -341,6 +347,7 @@ Environment variables:
 - `IMAP_TLS_SKIP_VERIFY` - disable IMAP certificate verification (last resort)
 - `IMAP_USE_TLS`
 - `IMAP_USERNAME`
+- `MAILDIR_PATH` - read reports from a local Maildir instead of IMAP; set this and no IMAP settings are needed
 - `SERVER_HOST`
 - `SERVER_PORT`
 

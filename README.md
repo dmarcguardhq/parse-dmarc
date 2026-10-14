@@ -36,7 +36,7 @@ Parse DMARC is built and maintained by the team behind [DMARCguard](https://dmar
 
 When your DMARC record carries a `rua=` address, mail receivers such as Google, Microsoft and Yahoo send you aggregate reports: gzip or zip XML attachments, at the interval your record asks for and daily by default, listing every IP that sent mail as your domain and whether SPF and DKIM passed ([RFC 7489 section 7.2](https://www.rfc-editor.org/rfc/rfc7489#section-7.2), carried forward by [RFC 9990](https://www.rfc-editor.org/rfc/rfc9990)). Nobody reads those by hand. Parse DMARC does:
 
-- Fetches reports over IMAP from any mailbox. Reports that Exchange or Outlook forward as `message/rfc822` attachments are unwrapped too.
+- Fetches reports over IMAP from any mailbox, or from a local Maildir when the mail server is on the same host (`MAILDIR_PATH`, see [Configuration](#configuration)). Reports that Exchange or Outlook forward as `message/rfc822` attachments are unwrapped too.
 - Parses gzip, zip and raw XML, with a 16 MB decompression cap per report.
 - Stores everything in one SQLite file. No database server, no JVM.
 - Shows pass rate, message volume and top sending sources, and opens any report down to its raw records.
@@ -126,25 +126,28 @@ One click on a platform, or a template for the self-hosted PaaS you already run.
 
 Every setting is an environment variable or a key in `config.json`. Environment is read first and the file overrides it.
 
-| Setting                       | Environment variable             | Default                                                      |
-| ----------------------------- | -------------------------------- | ------------------------------------------------------------ |
-| IMAP host and port            | `IMAP_HOST`, `IMAP_PORT`         | required, `993`                                              |
-| IMAP username and password    | `IMAP_USERNAME`, `IMAP_PASSWORD` | required                                                     |
-| Mailbox to read               | `IMAP_MAILBOX`                   | `INBOX`                                                      |
-| Implicit TLS                  | `IMAP_USE_TLS`                   | `true`                                                       |
-| STARTTLS on a plaintext port  | `IMAP_STARTTLS`                  | `false`                                                      |
-| Internal CA bundle, PEM       | `IMAP_TLS_CA_FILE`               | unset                                                        |
-| Skip certificate verification | `IMAP_TLS_SKIP_VERIFY`           | `false`                                                      |
-| Mark fetched mail as seen     | `IMAP_MARK_AS_SEEN`              | `true`                                                       |
-| Move processed mail to        | `IMAP_PROCESSED_MAILBOX`         | unset                                                        |
-| Database file                 | `DATABASE_PATH`                  | `~/.parse-dmarc/db.sqlite`, `/data/parse-dmarc.db` in Docker |
-| HTTP listen                   | `SERVER_HOST`, `SERVER_PORT`     | all interfaces, `8080`                                       |
-| Seconds between fetches       | `FETCH_INTERVAL`                 | `300`                                                        |
-| Log level                     | `LOG_LEVEL`                      | `info`                                                       |
+| Setting                        | Environment variable             | Default                                                      |
+| ------------------------------ | -------------------------------- | ------------------------------------------------------------ |
+| IMAP host and port             | `IMAP_HOST`, `IMAP_PORT`         | required, `993`                                              |
+| IMAP username and password     | `IMAP_USERNAME`, `IMAP_PASSWORD` | required                                                     |
+| Mailbox to read                | `IMAP_MAILBOX`                   | `INBOX`                                                      |
+| Implicit TLS                   | `IMAP_USE_TLS`                   | `true`                                                       |
+| STARTTLS on a plaintext port   | `IMAP_STARTTLS`                  | `false`                                                      |
+| Internal CA bundle, PEM        | `IMAP_TLS_CA_FILE`               | unset                                                        |
+| Skip certificate verification  | `IMAP_TLS_SKIP_VERIFY`           | `false`                                                      |
+| Mark fetched mail as seen      | `IMAP_MARK_AS_SEEN`              | `true`                                                       |
+| Move processed mail to         | `IMAP_PROCESSED_MAILBOX`         | unset                                                        |
+| Maildir intake instead of IMAP | `MAILDIR_PATH`                   | unset                                                        |
+| Database file                  | `DATABASE_PATH`                  | `~/.parse-dmarc/db.sqlite`, `/data/parse-dmarc.db` in Docker |
+| HTTP listen                    | `SERVER_HOST`, `SERVER_PORT`     | all interfaces, `8080`                                       |
+| Seconds between fetches        | `FETCH_INTERVAL`                 | `300`                                                        |
+| Log level                      | `LOG_LEVEL`                      | `info`                                                       |
 
 Providers: Gmail is `imap.gmail.com` on 993 with an App Password. Microsoft 365 is `outlook.office365.com` on 993. Anything else is port 993 with TLS unless its documentation says otherwise.
 
 An IMAP server whose certificate comes from your own CA fails with `x509: certificate signed by unknown authority`. Mount the CA bundle and point `IMAP_TLS_CA_FILE` at it; verification stays on. `IMAP_TLS_SKIP_VERIFY=true` also connects and is the last resort, because the session can then be intercepted. `IMAP_STARTTLS=true` dials plaintext, usually port 143, and upgrades; it takes precedence over `IMAP_USE_TLS`. Turning TLS off entirely is plaintext IMAP, and most servers refuse `LOGIN` on it.
+
+On a host that already receives the reports, point `MAILDIR_PATH` at the Maildir (for example `/var/mail/dmarc/Maildir`) and no IMAP settings are needed: every fetch reads `<MAILDIR_PATH>/new` and moves each message to `<MAILDIR_PATH>/cur` once it has been parsed. The messages are read as whole emails, exactly as Postfix or Courier deliver them.
 
 | Flag                        | What it does                                                                                  |
 | --------------------------- | --------------------------------------------------------------------------------------------- |
@@ -188,7 +191,7 @@ Run Parse DMARC when you want the data on your own disk and one mailbox to watch
 
 ## Roadmap and contributing
 
-The three most-asked additions, in the order people ask: TLS-RPT reports ([#154](https://github.com/dmarcguardhq/parse-dmarc/issues/154)), a Maildir or directory intake for people without IMAP ([#169](https://github.com/dmarcguardhq/parse-dmarc/issues/169)), and whois on sending sources ([#143](https://github.com/dmarcguardhq/parse-dmarc/issues/143)). [ROADMAP.md](ROADMAP.md) has the rest. [CONTRIBUTING.md](CONTRIBUTING.md) covers the toolchain: `just build`, `just dev`, and `docker compose up` for a local Dovecot seeded with a sample report.
+The most-asked additions, in the order people ask: TLS-RPT reports ([#154](https://github.com/dmarcguardhq/parse-dmarc/issues/154)) and whois on sending sources ([#143](https://github.com/dmarcguardhq/parse-dmarc/issues/143)). [ROADMAP.md](ROADMAP.md) has the rest. [CONTRIBUTING.md](CONTRIBUTING.md) covers the toolchain: `just build`, `just dev`, and `docker compose up` for a local Dovecot seeded with a sample report.
 
 ## License
 

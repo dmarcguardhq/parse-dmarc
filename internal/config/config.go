@@ -24,6 +24,7 @@ type Config struct {
 	LogLevel    string         `json:"log_level" env:"LOG_LEVEL" envDefault:"info"`
 	ColoredLogs bool           `json:"colored_logs" env:"COLORED_LOGS" envDefault:"false"`
 	IMAP        IMAPConfig     `json:"imap"`
+	Maildir     MaildirConfig  `json:"maildir"`
 	Database    DatabaseConfig `json:"database"`
 	Server      ServerConfig   `json:"server"`
 }
@@ -49,6 +50,13 @@ type IMAPConfig struct {
 
 	MarkAsSeen       bool   `json:"mark_as_seen" env:"IMAP_MARK_AS_SEEN" envDefault:"true"`
 	ProcessedMailbox string `json:"processed_mailbox" env:"IMAP_PROCESSED_MAILBOX"`
+}
+
+// MaildirConfig holds local Maildir intake configuration. When Path is set,
+// reports are read from <Path>/new and moved to <Path>/cur instead of being
+// fetched over IMAP, and no IMAP credentials are needed.
+type MaildirConfig struct {
+	Path string `json:"path" env:"MAILDIR_PATH"`
 }
 
 // DatabaseConfig holds database configuration
@@ -133,9 +141,13 @@ func Load(path string) (*Config, error) {
 }
 
 // Validate checks that all required configuration values are set.
-// Required fields: IMAP host, username, and password.
+// Required fields: IMAP host, username, and password, unless a Maildir
+// replaces the mailbox and the fetch does not touch IMAP at all.
 // Returns nil if valid, or an error describing the missing configuration.
 func (c *Config) Validate() error {
+	if c.Maildir.Path != "" {
+		return nil
+	}
 	if c.IMAP.Host == "" {
 		return ErrMissingIMAPHost
 	}
@@ -156,6 +168,7 @@ func GenerateSample(path string) error {
 	}
 	sample := Config{
 		LogLevel: "info",
+		Maildir:  MaildirConfig{Path: ""},
 		IMAP: IMAPConfig{
 			Host:     "imap.example.com",
 			Port:     993,

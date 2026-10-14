@@ -13,6 +13,7 @@ import (
 	"github.com/meysam81/parse-dmarc/internal/config"
 	"github.com/meysam81/parse-dmarc/internal/imap"
 	"github.com/meysam81/parse-dmarc/internal/logger"
+	"github.com/meysam81/parse-dmarc/internal/maildir"
 	"github.com/meysam81/parse-dmarc/internal/metrics"
 	"github.com/meysam81/parse-dmarc/internal/parser"
 	"github.com/meysam81/parse-dmarc/internal/storage"
@@ -127,7 +128,16 @@ func run(ctx context.Context, version, commit, date string) error {
 	}
 }
 
+// fetchReports reads one batch of reports from the source the configuration
+// names: a Maildir when MAILDIR_PATH is set, IMAP otherwise.
 func fetchReports(cfg *config.Config, store *storage.Storage, m *metrics.Metrics) error {
+	if cfg.Maildir.Path != "" {
+		return fetchMaildirReports(cfg, store, m)
+	}
+	return fetchIMAPReports(cfg, store, m)
+}
+
+func fetchIMAPReports(cfg *config.Config, store *storage.Storage, m *metrics.Metrics) error {
 	log.Info().Msg("fetching DMARC reports")
 
 	fetchStart := time.Now()
@@ -173,10 +183,91 @@ func fetchReports(cfg *config.Config, store *storage.Storage, m *metrics.Metrics
 	}
 
 	log.Info().Int("count", len(result.Reports)).Msg("processing reports")
+	processed := processReports(result.Reports, store, m)
 
-	// Process each report
+	// Post-processing: mark as seen and/or move messages
+	if len(result.MessageIDs) > 0 {
+		if cfg.IMAP.MarkAsSeen {
+			if err := client.MarkAsSeen(result.MessageIDs); err != nil {
+				log.Error().Err(err).Msg("failed to mark messages as seen")
+			} else {
+				log.Info().Int("count", len(result.MessageIDs)).Msg("marked messages as seen")
+			}
+		}
+		if cfg.IMAP.ProcessedMailbox != "" {
+			if err := client.MoveMessages(result.MessageIDs, cfg.IMAP.ProcessedMailbox); err != nil {
+				log.Error().Err(err).Msg("failed to move messages to processed mailbox")
+			} else {
+				log.Info().Int("count", len(result.MessageIDs)).Str("mailbox", cfg.IMAP.ProcessedMailbox).Msg("moved messages to processed mailbox")
+			}
+		}
+	}
+
+	if m != nil {
+		m.RecordFetchDuration(time.Since(fetchStart))
+		m.LastFetchTimestamp.SetToCurrentTime()
+	}
+
+	log.Info().Int("count", processed).Msg("reports processed")
+	return nil
+}
+
+// fetchMaildirReports reads the messages a MTA delivered into a local Maildir
+// and moves the whole batch to cur/ once it has been through the store.
+func fetchMaildirReports(cfg *config.Config, store *storage.Storage, m *metrics.Metrics) error {
+	log.Info().Str("path", cfg.Maildir.Path).Msg("fetching DMARC reports from Maildir")
+
+	fetchStart := time.Now()
+	if m != nil {
+		m.FetchCyclesTotal.Inc()
+	}
+
+	client := maildir.NewClient(&cfg.Maildir, log)
+	result, err := client.FetchDMARCReports()
+	if err != nil {
+		if m != nil {
+			m.FetchErrors.Inc()
+		}
+		return fmt.Errorf("fetch DMARC reports from maildir: %w", err)
+	}
+
+	if m != nil {
+		m.ReportsFetched.Add(float64(len(result.Reports)))
+	}
+
 	processed := 0
-	for _, report := range result.Reports {
+	if len(result.Reports) > 0 {
+		log.Info().Int("count", len(result.Reports)).Msg("processing reports")
+		processed = processReports(result.Reports, store, m)
+	} else {
+		log.Info().Msg("no new reports found")
+	}
+
+	// Every message read in this cycle leaves new/, recognized or not: a
+	// Maildir has no unseen flag, so a message left there is read again on
+	// every following cycle.
+	if len(result.MessageIDs) > 0 {
+		if err := client.MoveToCur(result.MessageIDs); err != nil {
+			log.Error().Err(err).Msg("failed to move messages to cur")
+		} else {
+			log.Info().Int("count", len(result.MessageIDs)).Msg("moved messages to cur")
+		}
+	}
+
+	if m != nil {
+		m.RecordFetchDuration(time.Since(fetchStart))
+		m.LastFetchTimestamp.SetToCurrentTime()
+	}
+
+	log.Info().Int("count", processed).Msg("reports processed")
+	return nil
+}
+
+// processReports parses and stores the report attachments of one batch and
+// returns how many reports were saved.
+func processReports(reports []imap.Report, store *storage.Storage, m *metrics.Metrics) int {
+	processed := 0
+	for _, report := range reports {
 		for _, attachment := range report.Attachments {
 			if m != nil {
 				m.AttachmentsTotal.Inc()
@@ -222,30 +313,5 @@ func fetchReports(cfg *config.Config, store *storage.Storage, m *metrics.Metrics
 			processed++
 		}
 	}
-
-	// Post-processing: mark as seen and/or move messages
-	if len(result.MessageIDs) > 0 {
-		if cfg.IMAP.MarkAsSeen {
-			if err := client.MarkAsSeen(result.MessageIDs); err != nil {
-				log.Error().Err(err).Msg("failed to mark messages as seen")
-			} else {
-				log.Info().Int("count", len(result.MessageIDs)).Msg("marked messages as seen")
-			}
-		}
-		if cfg.IMAP.ProcessedMailbox != "" {
-			if err := client.MoveMessages(result.MessageIDs, cfg.IMAP.ProcessedMailbox); err != nil {
-				log.Error().Err(err).Msg("failed to move messages to processed mailbox")
-			} else {
-				log.Info().Int("count", len(result.MessageIDs)).Str("mailbox", cfg.IMAP.ProcessedMailbox).Msg("moved messages to processed mailbox")
-			}
-		}
-	}
-
-	if m != nil {
-		m.RecordFetchDuration(time.Since(fetchStart))
-		m.LastFetchTimestamp.SetToCurrentTime()
-	}
-
-	log.Info().Int("count", processed).Msg("reports processed")
-	return nil
+	return processed
 }

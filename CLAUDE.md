@@ -27,7 +27,7 @@ parse-dmarc/
 │   │   └── config.go          # Config loading and validation
 │   ├── imap/                  # IMAP client for fetching emails
 │   │   └── client.go          # Email fetching logic
-│   ├── maildir/               # Local Maildir intake (new/ -> cur/)
+│   ├── maildir/               # Local Maildir intake (new/ -> cur/ or deadletter)
 │   │   └── maildir.go         # Maildir message reading
 │   ├── logger/                # Structured logging setup
 │   │   └── logger.go          # Zerolog configuration
@@ -321,7 +321,8 @@ Config via JSON file or environment variables (using caarlos0/env):
     "processed_mailbox": ""
   },
   "maildir": {
-    "path": ""
+    "path": "",
+    "deadletter_mailbox": "DEADLETTER"
   },
   "database": {
     "path": "~/.parse-dmarc/db.sqlite"
@@ -348,6 +349,7 @@ Environment variables:
 - `IMAP_USE_TLS`
 - `IMAP_USERNAME`
 - `MAILDIR_PATH` - read reports from a local Maildir instead of IMAP; set this and no IMAP settings are needed
+- `IMAP_DEADLETTER_BOX` - subdirectory of `MAILDIR_PATH` that receives messages no report could be read from (default `DEADLETTER`)
 - `SERVER_HOST`
 - `SERVER_PORT`
 

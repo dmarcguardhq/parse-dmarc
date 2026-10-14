@@ -30,3 +30,21 @@ func TestMaildirPathFromEnv(t *testing.T) {
 		t.Fatalf("want MAILDIR_PATH in the config, got %q", cfg.Maildir.Path)
 	}
 }
+
+func TestMaildirDeadletterBoxFromEnv(t *testing.T) {
+	var cfg Config
+	if err := env.Parse(&cfg); err != nil {
+		t.Fatal(err)
+	}
+	if cfg.Maildir.DeadletterMailbox != "DEADLETTER" {
+		t.Fatalf("want the IMAP_DEADLETTER_BOX default, got %q", cfg.Maildir.DeadletterMailbox)
+	}
+
+	t.Setenv("IMAP_DEADLETTER_BOX", "BROKEN")
+	if err := env.Parse(&cfg); err != nil {
+		t.Fatal(err)
+	}
+	if cfg.Maildir.DeadletterMailbox != "BROKEN" {
+		t.Fatalf("want IMAP_DEADLETTER_BOX in the config, got %q", cfg.Maildir.DeadletterMailbox)
+	}
+}

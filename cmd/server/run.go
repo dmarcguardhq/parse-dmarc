@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
+	"slices"
 	"syscall"
 	"time"
 
@@ -183,7 +184,7 @@ func fetchIMAPReports(cfg *config.Config, store *storage.Storage, m *metrics.Met
 	}
 
 	log.Info().Int("count", len(result.Reports)).Msg("processing reports")
-	processed := processReports(result.Reports, store, m)
+	processed, _ := processReports(result.Reports, store, m)
 
 	// Post-processing: mark as seen and/or move messages
 	if len(result.MessageIDs) > 0 {
@@ -222,7 +223,13 @@ func fetchMaildirReports(cfg *config.Config, store *storage.Storage, m *metrics.
 		m.FetchCyclesTotal.Inc()
 	}
 
-	client := maildir.NewClient(&cfg.Maildir, log)
+	client, err := maildir.NewClient(&cfg.Maildir, log)
+	if err != nil {
+		if m != nil {
+			m.FetchErrors.Inc()
+		}
+		return fmt.Errorf("maildir client: %w", err)
+	}
 	result, err := client.FetchDMARCReports()
 	if err != nil {
 		if m != nil {
@@ -236,21 +243,37 @@ func fetchMaildirReports(cfg *config.Config, store *storage.Storage, m *metrics.
 	}
 
 	processed := 0
+	var failed []uint32
 	if len(result.Reports) > 0 {
 		log.Info().Int("count", len(result.Reports)).Msg("processing reports")
-		processed = processReports(result.Reports, store, m)
+		processed, failed = processReports(result.Reports, store, m)
 	} else {
 		log.Info().Msg("no new reports found")
 	}
 
-	// Every message read in this cycle leaves new/, recognized or not: a
-	// Maildir has no unseen flag, so a message left there is read again on
-	// every following cycle.
-	if len(result.MessageIDs) > 0 {
-		if err := client.MoveToCur(result.MessageIDs); err != nil {
+	// Messages that carried no report at all, and messages whose report did
+	// not parse or store, go to the deadletter mailbox: the operator sees
+	// them there instead of them passing as processed.
+	deadletter := append(result.DeadletterIDs, failed...)
+	if len(deadletter) > 0 {
+		if err := client.MoveToDeadletter(deadletter); err != nil {
+			log.Error().Err(err).Str("mailbox", cfg.Maildir.DeadletterMailbox).Msg("failed to move messages to deadletter mailbox")
+		} else {
+			log.Info().Int("count", len(deadletter)).Str("mailbox", cfg.Maildir.DeadletterMailbox).Msg("moved messages to deadletter mailbox")
+		}
+	}
+
+	// Every other message read in this cycle leaves new/: a Maildir has no
+	// unseen flag, so a message left there is read again on every following
+	// cycle.
+	remaining := slices.DeleteFunc(slices.Clone(result.MessageIDs), func(id uint32) bool {
+		return slices.Contains(deadletter, id)
+	})
+	if len(remaining) > 0 {
+		if err := client.MoveToCur(remaining); err != nil {
 			log.Error().Err(err).Msg("failed to move messages to cur")
 		} else {
-			log.Info().Int("count", len(result.MessageIDs)).Msg("moved messages to cur")
+			log.Info().Int("count", len(remaining)).Msg("moved messages to cur")
 		}
 	}
 
@@ -263,11 +286,15 @@ func fetchMaildirReports(cfg *config.Config, store *storage.Storage, m *metrics.
 	return nil
 }
 
-// processReports parses and stores the report attachments of one batch and
-// returns how many reports were saved.
-func processReports(reports []imap.Report, store *storage.Storage, m *metrics.Metrics) int {
+// processReports parses and stores the report attachments of one batch. It
+// returns how many reports were saved, and the IDs of the messages that
+// reached the store with nothing, so the caller can flag them to the operator.
+func processReports(reports []imap.Report, store *storage.Storage, m *metrics.Metrics) (int, []uint32) {
 	processed := 0
+	var failed []uint32
 	for _, report := range reports {
+		before := processed
+
 		for _, attachment := range report.Attachments {
 			if m != nil {
 				m.AttachmentsTotal.Inc()
@@ -312,6 +339,12 @@ func processReports(reports []imap.Report, store *storage.Storage, m *metrics.Me
 				Msg("saved report")
 			processed++
 		}
+
+		// Nothing in this message reached the store: no report attachment that
+		// parsed, or a save that failed.
+		if processed == before {
+			failed = append(failed, report.UID)
+		}
 	}
-	return processed
+	return processed, failed
 }

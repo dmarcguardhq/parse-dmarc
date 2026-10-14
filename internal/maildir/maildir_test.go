@@ -55,14 +55,18 @@ func TestFetchThenMoveToCur(t *testing.T) {
 	})
 
 	log := zerolog.Nop()
-	c := NewClient(&config.MaildirConfig{Path: dir}, &log)
+	c, err := NewClient(&config.MaildirConfig{Path: dir, DeadletterMailbox: "DEADLETTER"}, &log)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	result, err := c.FetchDMARCReports()
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(result.Reports) != 1 || len(result.MessageIDs) != 2 {
-		t.Fatalf("want 1 report out of 2 messages, got %d reports / %d message IDs", len(result.Reports), len(result.MessageIDs))
+	if len(result.Reports) != 1 || len(result.MessageIDs) != 1 || len(result.DeadletterIDs) != 1 {
+		t.Fatalf("want 1 report out of 2 messages and the other one a deadletter, got %d reports / %d message IDs / %d deadletter IDs",
+			len(result.Reports), len(result.MessageIDs), len(result.DeadletterIDs))
 	}
 	if len(result.Reports[0].Attachments) != 1 {
 		t.Fatalf("want 1 attachment, got %d", len(result.Reports[0].Attachments))
@@ -75,6 +79,9 @@ func TestFetchThenMoveToCur(t *testing.T) {
 		t.Fatalf("want the Message-ID header, got %q", result.Reports[0].MessageID)
 	}
 
+	if err := c.MoveToDeadletter(result.DeadletterIDs); err != nil {
+		t.Fatal(err)
+	}
 	if err := c.MoveToCur(result.MessageIDs); err != nil {
 		t.Fatal(err)
 	}
@@ -86,10 +93,11 @@ func TestFetchThenMoveToCur(t *testing.T) {
 	if len(newLeft) != 0 {
 		t.Fatalf("want new/ empty after the move, %d left", len(newLeft))
 	}
-	// Both messages move, report or not: on disk new/ is the queue.
-	for _, name := range []string{"1700000000.report:2,S", "1700000001.chatter:2,S"} {
-		if _, err := os.Stat(filepath.Join(dir, "cur", name)); err != nil {
-			t.Errorf("want %s in cur/: %v", name, err)
+	// The message with no report is not dropped: it waits in the deadletter
+	// mailbox for the operator, and the report itself is done with in cur/.
+	for _, name := range []string{"cur/1700000000.report:2,S", "DEADLETTER/1700000001.chatter:2,S"} {
+		if _, err := os.Stat(filepath.Join(dir, filepath.FromSlash(name))); err != nil {
+			t.Errorf("want %s: %v", name, err)
 		}
 	}
 	content, err := os.ReadFile(filepath.Join(dir, "cur", "1700000000.report:2,S"))
@@ -105,24 +113,49 @@ func TestFetchThenMoveToCur(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(again.Reports) != 0 || len(again.MessageIDs) != 0 {
-		t.Fatalf("want an empty second fetch, got %d reports / %d message IDs", len(again.Reports), len(again.MessageIDs))
+	if len(again.Reports) != 0 || len(again.MessageIDs) != 0 || len(again.DeadletterIDs) != 0 {
+		t.Fatalf("want an empty second fetch, got %d reports / %d message IDs / %d deadletter IDs",
+			len(again.Reports), len(again.MessageIDs), len(again.DeadletterIDs))
+	}
+}
+
+// A Maildir the process cannot read looks like an empty one, so NewClient
+// fails at startup instead of every cycle silently finding nothing.
+func TestNewClientRejectsUnreadablePath(t *testing.T) {
+	log := zerolog.Nop()
+	if _, err := NewClient(&config.MaildirConfig{Path: filepath.Join(t.TempDir(), "missing")}, &log); err == nil {
+		t.Fatal("want an error for a path that does not exist")
+	}
+
+	if os.Geteuid() == 0 {
+		t.Skip("root reads a 0o000 directory all the same")
+	}
+	dir := t.TempDir()
+	if err := os.Chmod(dir, 0o000); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = os.Chmod(dir, 0o700) })
+	if _, err := NewClient(&config.MaildirConfig{Path: dir}, &log); err == nil {
+		t.Fatal("want an error for a path the process cannot read")
 	}
 }
 
 func TestFetchWithoutNewDir(t *testing.T) {
 	log := zerolog.Nop()
-	c := NewClient(&config.MaildirConfig{Path: t.TempDir()}, &log)
+	c, err := NewClient(&config.MaildirConfig{Path: t.TempDir()}, &log)
+	if err != nil {
+		t.Fatal(err)
+	}
 	if _, err := c.FetchDMARCReports(); err == nil {
 		t.Fatal("want an error for a directory that is not a Maildir")
 	}
 }
 
-func TestCurNameReplacesExistingInfo(t *testing.T) {
-	if got := curName("1700000000.report:2,SR"); got != "1700000000.report:2,S" {
+func TestInfoNameReplacesExistingInfo(t *testing.T) {
+	if got := infoName("1700000000.report:2,SR"); got != "1700000000.report:2,S" {
 		t.Fatalf("want the info block replaced, got %q", got)
 	}
-	if got := curName("1700000000.report"); got != "1700000000.report:2,S" {
+	if got := infoName("1700000000.report"); got != "1700000000.report:2,S" {
 		t.Fatalf("want an info block added, got %q", got)
 	}
 }

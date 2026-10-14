@@ -13,7 +13,8 @@
   },
   "log_level": "info",
   "maildir": {
-    "path": ""
+    "path": "",
+    "deadletter_mailbox": "DEADLETTER"
   },
   "server": {
     "host": "0.0.0.0",

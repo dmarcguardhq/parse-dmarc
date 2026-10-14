@@ -136,6 +136,10 @@ type Attachment struct {
 type FetchResult struct {
 	Reports    []Report
 	MessageIDs []uint32
+	// DeadletterIDs are the messages of the batch that carried no report at
+	// all. The Maildir intake moves them to the deadletter mailbox instead of
+	// cur/, so they are not fetched again as if nothing happened.
+	DeadletterIDs []uint32
 }
 
 // FetchDMARCReports fetches DMARC reports from the mailbox

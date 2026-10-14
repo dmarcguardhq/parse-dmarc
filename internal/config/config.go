@@ -57,6 +57,10 @@ type IMAPConfig struct {
 // fetched over IMAP, and no IMAP credentials are needed.
 type MaildirConfig struct {
 	Path string `json:"path" env:"MAILDIR_PATH"`
+	// DeadletterMailbox is the subdirectory of Path that receives every
+	// message no report could be read from, so the operator sees what the
+	// parser dropped instead of it passing as processed.
+	DeadletterMailbox string `json:"deadletter_mailbox" env:"IMAP_DEADLETTER_BOX" envDefault:"DEADLETTER"`
 }
 
 // DatabaseConfig holds database configuration
@@ -120,6 +124,9 @@ func Load(path string) (*Config, error) {
 	if cfg.IMAP.Mailbox == "" {
 		cfg.IMAP.Mailbox = "INBOX"
 	}
+	if cfg.Maildir.DeadletterMailbox == "" {
+		cfg.Maildir.DeadletterMailbox = "DEADLETTER"
+	}
 	if cfg.Database.Path == "" {
 		cfg.Database.Path, err = defaultDBPath()
 		if err != nil || ensureDBPathExists(cfg.Database.Path) != nil {
@@ -168,7 +175,7 @@ func GenerateSample(path string) error {
 	}
 	sample := Config{
 		LogLevel: "info",
-		Maildir:  MaildirConfig{Path: ""},
+		Maildir:  MaildirConfig{Path: "", DeadletterMailbox: "DEADLETTER"},
 		IMAP: IMAPConfig{
 			Host:     "imap.example.com",
 			Port:     993,

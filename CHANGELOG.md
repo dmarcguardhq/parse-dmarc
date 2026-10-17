@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.2](https://github.com/dmarcguardhq/parse-dmarc/compare/v1.7.1...v1.7.2) (2026-10-17)
+
+
+### Bug Fixes
+
+* declare module path github.com/dmarcguardhq/parse-dmarc ([#219](https://github.com/dmarcguardhq/parse-dmarc/issues/219)) ([a081972](https://github.com/dmarcguardhq/parse-dmarc/commit/a081972a738c75a291291de833fe4802265f2d08)), closes [#218](https://github.com/dmarcguardhq/parse-dmarc/issues/218)
+
 ## [1.7.1](https://github.com/dmarcguardhq/parse-dmarc/compare/v1.7.0...v1.7.1) (2026-10-14)
 
 

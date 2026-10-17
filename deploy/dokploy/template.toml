@@ -1,14 +1,14 @@
 # Parse DMARC - Dokploy Template
 # DMARC Report Analyzer
-# https://github.com/meysam81/parse-dmarc
+# https://github.com/dmarcguardhq/parse-dmarc
 
 [meta]
 name = "Parse DMARC"
 description = "Monitor who's sending email on behalf of your domain. Catch spoofing. Stop phishing."
-logo = "https://raw.githubusercontent.com/meysam81/parse-dmarc/main/assets/icon-256x256.png"
+logo = "https://raw.githubusercontent.com/dmarcguardhq/parse-dmarc/main/assets/icon-256x256.png"
 links = [
-    { label = "Website", url = "https://github.com/meysam81/parse-dmarc" },
-    { label = "Documentation", url = "https://github.com/meysam81/parse-dmarc#readme" }
+    { label = "Website", url = "https://github.com/dmarcguardhq/parse-dmarc" },
+    { label = "Documentation", url = "https://github.com/dmarcguardhq/parse-dmarc#readme" }
 ]
 tags = ["security", "email", "dmarc", "monitoring", "analytics"]
 

@@ -4,7 +4,7 @@
 name: Parse DMARC
 slug: parse-dmarc
 tagline: Monitor who's sending email on behalf of your domain
-logo_url: https://raw.githubusercontent.com/meysam81/parse-dmarc/main/assets/icon-256x256.png
+logo_url: https://raw.githubusercontent.com/dmarcguardhq/parse-dmarc/main/assets/icon-256x256.png
 
 categories:
   - Security
@@ -60,20 +60,20 @@ description: |
 
   ## Support
 
-  - Documentation: https://github.com/meysam81/parse-dmarc
-  - Issues: https://github.com/meysam81/parse-dmarc/issues
+  - Documentation: https://github.com/dmarcguardhq/parse-dmarc
+  - Issues: https://github.com/dmarcguardhq/parse-dmarc/issues
 
 support_email: support@parsedmarc.com
-support_url: https://github.com/meysam81/parse-dmarc/issues
+support_url: https://github.com/dmarcguardhq/parse-dmarc/issues
 
 license: Apache-2.0
-license_url: https://github.com/meysam81/parse-dmarc/blob/main/LICENSE
+license_url: https://github.com/dmarcguardhq/parse-dmarc/blob/main/LICENSE
 
 # Software included
 software:
   - name: Parse DMARC
     version: latest
-    website: https://github.com/meysam81/parse-dmarc
+    website: https://github.com/dmarcguardhq/parse-dmarc
     license: Apache-2.0
 
   - name: Ubuntu

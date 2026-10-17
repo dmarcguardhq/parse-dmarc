@@ -12,8 +12,8 @@ import (
 	"github.com/goccy/go-json"
 	"github.com/rs/zerolog"
 
-	"github.com/meysam81/parse-dmarc/internal/metrics"
-	"github.com/meysam81/parse-dmarc/internal/storage"
+	"github.com/dmarcguardhq/parse-dmarc/internal/metrics"
+	"github.com/dmarcguardhq/parse-dmarc/internal/storage"
 )
 
 //go:embed dist

@@ -7,7 +7,7 @@ import (
 
 	"github.com/goccy/go-json"
 
-	"github.com/meysam81/parse-dmarc/internal/parser"
+	"github.com/dmarcguardhq/parse-dmarc/internal/parser"
 )
 
 func TestGetStatistics_HasData(t *testing.T) {

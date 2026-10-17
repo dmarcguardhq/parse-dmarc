@@ -5,8 +5,8 @@ import (
 	"encoding/base64"
 	"fmt"
 
-	"github.com/meysam81/parse-dmarc/internal/parser"
-	"github.com/meysam81/parse-dmarc/internal/storage"
+	"github.com/dmarcguardhq/parse-dmarc/internal/parser"
+	"github.com/dmarcguardhq/parse-dmarc/internal/storage"
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
 

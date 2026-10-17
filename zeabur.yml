@@ -5,8 +5,8 @@ metadata:
   name: Parse DMARC
 spec:
   description: Monitor who's sending email on behalf of your domain. Catch spoofing. Stop phishing.
-  icon: https://raw.githubusercontent.com/meysam81/parse-dmarc/50d2ff2c54a506801e802daa6b5d375b79d1281d/public/favicon.png
-  coverImage: https://raw.githubusercontent.com/meysam81/parse-dmarc/50d2ff2c54a506801e802daa6b5d375b79d1281d/public/og-image.png
+  icon: https://raw.githubusercontent.com/dmarcguardhq/parse-dmarc/50d2ff2c54a506801e802daa6b5d375b79d1281d/public/favicon.png
+  coverImage: https://raw.githubusercontent.com/dmarcguardhq/parse-dmarc/50d2ff2c54a506801e802daa6b5d375b79d1281d/public/og-image.png
   variables:
     - key: PUBLIC_DOMAIN
       type: DOMAIN
@@ -48,10 +48,10 @@ spec:
     2. Configure IMAP credentials to fetch reports
     3. Access the dashboard to view DMARC reports
 
-    See the full documentation at https://github.com/meysam81/parse-dmarc
+    See the full documentation at https://github.com/dmarcguardhq/parse-dmarc
   services:
     - name: Parse DMARC
-      icon: https://raw.githubusercontent.com/meysam81/parse-dmarc/50d2ff2c54a506801e802daa6b5d375b79d1281d/public/favicon.png
+      icon: https://raw.githubusercontent.com/dmarcguardhq/parse-dmarc/50d2ff2c54a506801e802daa6b5d375b79d1281d/public/favicon.png
       template: PREBUILT
       domainKey: PUBLIC_DOMAIN
       spec:
@@ -157,7 +157,7 @@ localization:
       2. 配置 IMAP 凭据以获取报告
       3. 访问仪表板查看 DMARC 报告
 
-      完整文档请访问 https://github.com/meysam81/parse-dmarc
+      完整文档请访问 https://github.com/dmarcguardhq/parse-dmarc
   zh-Hant:
     description: 監控誰在代表您的域發送電子郵件。捕獲欺騙。阻止網絡釣魚。
     variables:
@@ -197,7 +197,7 @@ localization:
       2. 配置 IMAP 憑據以獲取報告
       3. 訪問儀表板查看 DMARC 報告
 
-      完整文檔請訪問 https://github.com/meysam81/parse-dmarc
+      完整文檔請訪問 https://github.com/dmarcguardhq/parse-dmarc
   zh-CN:
     description: 监控谁在代表您的域发送电子邮件。捕获欺骗。阻止钓鱼。
     variables:
@@ -237,7 +237,7 @@ localization:
       2. 配置 IMAP 凭据以获取报告
       3. 访问仪表板查看 DMARC 报告
 
-      完整文档请访问 https://github.com/meysam81/parse-dmarc
+      完整文档请访问 https://github.com/dmarcguardhq/parse-dmarc
   zh-TW:
     description: 監控誰在代表您的域發送電子郵件。捕獲欺騙。阻止釣魚。
     variables:
@@ -277,7 +277,7 @@ localization:
       2. 配置 IMAP 憑據以獲取報告
       3. 訪問儀表板查看 DMARC 報告
 
-      完整文檔請訪問 https://github.com/meysam81/parse-dmarc
+      完整文檔請訪問 https://github.com/dmarcguardhq/parse-dmarc
   ja-JP:
     description: ドメインの代わりにメールを送信している人を監視します。なりすましをキャッチします。フィッシングを阻止します。
     variables:
@@ -317,7 +317,7 @@ localization:
       2. レポートを取得するように IMAP 認証情報を設定する
       3. ダッシュボードにアクセスして DMARC レポートを表示する
 
-      完全なドキュメントについては https://github.com/meysam81/parse-dmarc を参照してください
+      完全なドキュメントについては https://github.com/dmarcguardhq/parse-dmarc を参照してください
   es-ES:
     description: Monitorea quién está enviando correos electrónicos en nombre de tu dominio. Detecta suplantaciones. Detén el phishing.
     variables:
@@ -357,7 +357,7 @@ localization:
       2. Configurar las credenciales de IMAP para obtener informes
       3. Acceder al panel de control para ver los informes de DMARC
 
-      Consulta la documentación completa en https://github.com/meysam81/parse-dmarc
+      Consulta la documentación completa en https://github.com/dmarcguardhq/parse-dmarc
   id-ID:
     description: Pantau siapa yang mengirim email atas nama domain Anda. Tangkap spoofing. Hentikan phishing.
     variables:
@@ -397,4 +397,4 @@ localization:
       2. Mengonfigurasi kredensial IMAP untuk mengambil laporan
       3. Mengakses dasbor untuk melihat laporan DMARC
 
-      Lihat dokumentasi lengkap di https://github.com/meysam81/parse-dmarc
+      Lihat dokumentasi lengkap di https://github.com/dmarcguardhq/parse-dmarc

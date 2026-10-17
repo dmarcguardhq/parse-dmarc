@@ -9,10 +9,10 @@ echo "==> Installing Parse DMARC (version: ${PARSE_DMARC_VERSION})..."
 
 # Determine the download URL
 if [ "$PARSE_DMARC_VERSION" = "latest" ]; then
-    DOWNLOAD_URL=$(curl -s https://api.github.com/repos/meysam81/parse-dmarc/releases/latest | \
+    DOWNLOAD_URL=$(curl -s https://api.github.com/repos/dmarcguardhq/parse-dmarc/releases/latest | \
         jq -r '.assets[] | select(.name | contains("linux_amd64")) | .browser_download_url')
 else
-    DOWNLOAD_URL="https://github.com/meysam81/parse-dmarc/releases/download/${PARSE_DMARC_VERSION}/parse-dmarc_${PARSE_DMARC_VERSION#v}_linux_amd64.tar.gz"
+    DOWNLOAD_URL="https://github.com/dmarcguardhq/parse-dmarc/releases/download/${PARSE_DMARC_VERSION}/parse-dmarc_${PARSE_DMARC_VERSION#v}_linux_amd64.tar.gz"
 fi
 
 echo "==> Downloading from: ${DOWNLOAD_URL}"

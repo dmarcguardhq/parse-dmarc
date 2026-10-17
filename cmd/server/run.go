@@ -10,14 +10,14 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/meysam81/parse-dmarc/internal/api"
-	"github.com/meysam81/parse-dmarc/internal/config"
-	"github.com/meysam81/parse-dmarc/internal/imap"
-	"github.com/meysam81/parse-dmarc/internal/logger"
-	"github.com/meysam81/parse-dmarc/internal/maildir"
-	"github.com/meysam81/parse-dmarc/internal/metrics"
-	"github.com/meysam81/parse-dmarc/internal/parser"
-	"github.com/meysam81/parse-dmarc/internal/storage"
+	"github.com/dmarcguardhq/parse-dmarc/internal/api"
+	"github.com/dmarcguardhq/parse-dmarc/internal/config"
+	"github.com/dmarcguardhq/parse-dmarc/internal/imap"
+	"github.com/dmarcguardhq/parse-dmarc/internal/logger"
+	"github.com/dmarcguardhq/parse-dmarc/internal/maildir"
+	"github.com/dmarcguardhq/parse-dmarc/internal/metrics"
+	"github.com/dmarcguardhq/parse-dmarc/internal/parser"
+	"github.com/dmarcguardhq/parse-dmarc/internal/storage"
 )
 
 func run(ctx context.Context, version, commit, date string) error {

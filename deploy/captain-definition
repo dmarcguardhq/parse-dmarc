@@ -41,11 +41,11 @@ caproverOneClickApp:
       2. Configure your DMARC DNS record: `_dmarc.yourdomain.com TXT v=DMARC1; p=none; rua=mailto:dmarc@yourdomain.com`
       3. Wait 24-48 hours for reports to start arriving
 
-      For more information, visit: https://github.com/meysam81/parse-dmarc
+      For more information, visit: https://github.com/dmarcguardhq/parse-dmarc
   variables:
     - id: $$cap_PARSE_DMARC_VERSION
       label: Application | Parse DMARC Version
-      description: Check out the releases page for valid versions https://github.com/meysam81/parse-dmarc/releases
+      description: Check out the releases page for valid versions https://github.com/dmarcguardhq/parse-dmarc/releases
       defaultValue: v1
       validRegex: /.{1,}/
     - id: $$cap_PARSE_DMARC_METRICS

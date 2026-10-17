@@ -31,7 +31,7 @@
       "title": "Parse DMARC GitHub",
       "tooltip": "View project on GitHub",
       "type": "link",
-      "url": "https://github.com/meysam81/parse-dmarc"
+      "url": "https://github.com/dmarcguardhq/parse-dmarc"
     }
   ],
   "panels": [

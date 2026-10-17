@@ -33,7 +33,7 @@
   "name": "parse-dmarc",
   "repository": {
     "type": "git",
-    "url": "https://github.com/meysam81/parse-dmarc.git"
+    "url": "https://github.com/dmarcguardhq/parse-dmarc.git"
   },
   "scripts": {
     "build": "vite build",

@@ -21,7 +21,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/meysam81/parse-dmarc/internal/config"
+	"github.com/dmarcguardhq/parse-dmarc/internal/config"
 	"github.com/rs/zerolog"
 )
 

@@ -1,4 +1,4 @@
-module github.com/meysam81/parse-dmarc
+module github.com/dmarcguardhq/parse-dmarc
 
 go 1.26.0
 

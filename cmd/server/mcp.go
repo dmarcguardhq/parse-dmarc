@@ -6,9 +6,9 @@ import (
 	"strings"
 	"syscall"
 
-	mcpserver "github.com/meysam81/parse-dmarc/internal/mcp"
-	"github.com/meysam81/parse-dmarc/internal/mcp/oauth"
-	"github.com/meysam81/parse-dmarc/internal/storage"
+	mcpserver "github.com/dmarcguardhq/parse-dmarc/internal/mcp"
+	"github.com/dmarcguardhq/parse-dmarc/internal/mcp/oauth"
+	"github.com/dmarcguardhq/parse-dmarc/internal/storage"
 )
 
 func runMCPServer(ctx context.Context, store *storage.Storage, version string) error {

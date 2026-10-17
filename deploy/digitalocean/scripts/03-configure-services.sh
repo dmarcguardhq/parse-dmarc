@@ -7,7 +7,7 @@ echo "==> Creating systemd service..."
 cat > /etc/systemd/system/parse-dmarc.service <<'EOF'
 [Unit]
 Description=Parse DMARC - DMARC Report Analyzer
-Documentation=https://github.com/meysam81/parse-dmarc
+Documentation=https://github.com/dmarcguardhq/parse-dmarc
 After=network-online.target
 Wants=network-online.target
 
@@ -185,7 +185,7 @@ echo " |  __/ (_| | |  \__ \  __/ | |_| | |  | |/ ___ \|  _ <| |___ "
 echo " |_|   \__,_|_|  |___/\___| |____/|_|  |_/_/   \_\_| \_\\____|"
 echo ""
 echo " DMARC Report Analyzer"
-echo " https://github.com/meysam81/parse-dmarc"
+echo " https://github.com/dmarcguardhq/parse-dmarc"
 echo ""
 echo "=========================================================================="
 echo ""

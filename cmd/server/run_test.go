@@ -5,9 +5,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/meysam81/parse-dmarc/internal/config"
-	"github.com/meysam81/parse-dmarc/internal/logger"
-	"github.com/meysam81/parse-dmarc/internal/storage"
+	"github.com/dmarcguardhq/parse-dmarc/internal/config"
+	"github.com/dmarcguardhq/parse-dmarc/internal/logger"
+	"github.com/dmarcguardhq/parse-dmarc/internal/storage"
 )
 
 const goodReportXML = `<?xml version="1.0"?><feedback><report_metadata><org_name>google.com</org_name>` +

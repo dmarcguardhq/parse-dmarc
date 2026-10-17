@@ -9,9 +9,9 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/dmarcguardhq/parse-dmarc/internal/config"
+	"github.com/dmarcguardhq/parse-dmarc/internal/imap"
 	"github.com/emersion/go-message/mail"
-	"github.com/meysam81/parse-dmarc/internal/config"
-	"github.com/meysam81/parse-dmarc/internal/imap"
 	"github.com/rs/zerolog"
 )
 

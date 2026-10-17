@@ -7,7 +7,7 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/urfave/cli/v3"
 
-	"github.com/meysam81/parse-dmarc/internal/logger"
+	"github.com/dmarcguardhq/parse-dmarc/internal/logger"
 )
 
 var (

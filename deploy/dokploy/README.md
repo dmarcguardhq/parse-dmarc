@@ -103,5 +103,5 @@ Check the logs for configuration errors. The three required variables must be se
 
 ## Links
 
-- [Parse DMARC GitHub](https://github.com/meysam81/parse-dmarc)
+- [Parse DMARC GitHub](https://github.com/dmarcguardhq/parse-dmarc)
 - [Dokploy Documentation](https://docs.dokploy.com/)

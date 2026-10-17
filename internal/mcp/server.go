@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/meysam81/parse-dmarc/internal/mcp/oauth"
-	"github.com/meysam81/parse-dmarc/internal/storage"
+	"github.com/dmarcguardhq/parse-dmarc/internal/mcp/oauth"
+	"github.com/dmarcguardhq/parse-dmarc/internal/storage"
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 	"github.com/rs/zerolog"
 )

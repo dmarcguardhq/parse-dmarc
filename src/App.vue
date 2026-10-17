@@ -260,7 +260,7 @@ onUnmounted(() => {
             </svg>
           </button>
           <a
-            href="https://github.com/meysam81/parse-dmarc"
+            href="https://github.com/dmarcguardhq/parse-dmarc"
             target="_blank"
             rel="noopener noreferrer"
             class="nav-github"
@@ -400,7 +400,7 @@ onUnmounted(() => {
             <h4>Parse DMARC</h4>
             <p>RFC 7489 Compliant DMARC Report Parser</p>
             <a
-              href="https://github.com/meysam81/parse-dmarc"
+              href="https://github.com/dmarcguardhq/parse-dmarc"
               target="_blank"
               rel="noopener noreferrer"
               class="github-star-link"
@@ -422,19 +422,19 @@ onUnmounted(() => {
             <h4>Links</h4>
             <div class="footer-links">
               <a
-                href="https://github.com/meysam81/parse-dmarc"
+                href="https://github.com/dmarcguardhq/parse-dmarc"
                 target="_blank"
                 rel="noopener"
                 >GitHub</a
               >
               <a
-                href="https://github.com/meysam81/parse-dmarc/issues"
+                href="https://github.com/dmarcguardhq/parse-dmarc/issues"
                 target="_blank"
                 rel="noopener"
                 >Issues</a
               >
               <a
-                href="https://github.com/meysam81/parse-dmarc/blob/main/README.md"
+                href="https://github.com/dmarcguardhq/parse-dmarc/blob/main/README.md"
                 target="_blank"
                 rel="noopener"
                 >Documentation</a
@@ -454,7 +454,7 @@ onUnmounted(() => {
                 >DMARC.org</a
               >
               <a
-                href="https://github.com/meysam81/parse-dmarc/blob/main/LICENSE"
+                href="https://github.com/dmarcguardhq/parse-dmarc/blob/main/LICENSE"
                 target="_blank"
                 rel="noopener"
                 >Apache-2.0 License</a

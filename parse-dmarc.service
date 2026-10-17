@@ -1,7 +1,7 @@
 [Unit]
 Description=DMARC Report Parser and Dashboard
 After=network.target
-Documentation=https://github.com/meysam81/parse-dmarc
+Documentation=https://github.com/dmarcguardhq/parse-dmarc
 
 [Service]
 Type=simple

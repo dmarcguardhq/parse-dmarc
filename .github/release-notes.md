@@ -31,10 +31,12 @@ brew install {{ $owner }}/tap/{{ .ProjectName }}
 nix profile install github:{{ $owner }}/nur#{{ .ProjectName }}   # or: nix run github:{{ $owner }}/nur#{{ .ProjectName }}
 ```
 
-**Binary** (swap `linux_amd64` for your platform; see the assets below)
+**Binary** (Linux/macOS; Windows: grab the `.zip` from the assets below)
 
 ```bash
-curl -fsSL {{ $repo }}/releases/download/{{ .Tag }}/{{ .ProjectName }}_linux_amd64.tar.gz | tar xz
+os=$(uname -s | tr '[:upper:]' '[:lower:]')
+arch=$(uname -m | sed -e 's/x86_64/amd64/' -e 's/aarch64/arm64/' -e 's/i[3-6]86/i386/')
+curl -fsSL {{ $repo }}/releases/download/{{ .Tag }}/{{ .ProjectName }}_${os}_${arch}.tar.gz | tar xz
 ```
 
 ## Verify
@@ -42,7 +44,7 @@ curl -fsSL {{ $repo }}/releases/download/{{ .Tag }}/{{ .ProjectName }}_linux_amd
 Archives carry [build provenance attestations]({{ $repo }}/attestations) and images are signed with cosign (keyless, GitHub Actions OIDC).
 
 ```bash
-gh attestation verify {{ .ProjectName }}_linux_amd64.tar.gz -R {{ $slug }}
+gh attestation verify {{ .ProjectName }}_${os}_${arch}.tar.gz -R {{ $slug }}
 
 cosign verify ghcr.io/{{ $slug }}:{{ .Tag }} \
   --certificate-identity-regexp '^{{ $repo }}/' \

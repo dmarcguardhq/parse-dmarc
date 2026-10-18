@@ -146,6 +146,9 @@ func (s *Server) handleReports(w http.ResponseWriter, r *http.Request) {
 			limit = l
 		}
 	}
+	if limit > storage.MaxReportLimit {
+		limit = storage.MaxReportLimit
+	}
 
 	if offsetStr := r.URL.Query().Get("offset"); offsetStr != "" {
 		if o, err := strconv.Atoi(offsetStr); err == nil && o >= 0 {

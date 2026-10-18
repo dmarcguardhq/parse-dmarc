@@ -104,8 +104,8 @@ func (s *Server) getReports(ctx context.Context, req *mcp.CallToolRequest, input
 	if limit <= 0 {
 		limit = 50
 	}
-	if limit > 100 {
-		limit = 100
+	if limit > storage.MaxReportLimit {
+		limit = storage.MaxReportLimit
 	}
 
 	offset := input.Offset

@@ -198,6 +198,10 @@ func (s *Storage) SaveReport(feedback *parser.Feedback) error {
 	return nil
 }
 
+// MaxReportLimit caps the page size GetReports callers may ask for, so one
+// request cannot buffer the whole table into memory.
+const MaxReportLimit = 100
+
 func (s *Storage) GetReports(limit, offset int) ([]ReportSummary, error) {
 	rows, err := s.db.Query(`
 		SELECT id, report_id, org_name, domain,

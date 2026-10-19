@@ -167,6 +167,8 @@ On a host that already receives the reports, point `MAILDIR_PATH` at the Maildir
 
 The HTTP API behind the dashboard is four `GET` routes: `/api/statistics`, `/api/reports`, `/api/reports/{id}` and `/api/top-sources`. None of them has authentication, so keep the port behind your reverse proxy or VPN.
 
+To serve the dashboard under a path such as `https://example.com/dmarc/`, have the proxy strip the prefix before forwarding, for example nginx's `location /dmarc/ { proxy_pass http://127.0.0.1:8080/; }`. The dashboard loads its assets and API relative to the page, so it needs no setting of its own.
+
 ## Parse DMARC or DMARCguard?
 
 Two products, one maker, separate codebases. Parse DMARC is the whole of this repository: no enterprise directory, nothing to unlock. DMARCguard is a hosted, proprietary service that reads the reports for you and tells you what to change.

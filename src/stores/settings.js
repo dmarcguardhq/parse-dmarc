@@ -27,7 +27,8 @@ function getDefaultApiUrl() {
   if (import.meta.env.DEV) {
     return "http://localhost:8080/api";
   }
-  return `${window.location.origin}/api`;
+  // Relative to the page, so a reverse proxy can serve the app under a subpath.
+  return new URL("api", window.location.href).href;
 }
 
 /**

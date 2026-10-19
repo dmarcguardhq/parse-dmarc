@@ -154,6 +154,9 @@ nix:
   # per-platform sha256) into dmarcguardhq/nur, whose flake.nix exposes it as
   # `nix run github:dmarcguardhq/nur#parse-dmarc`. Needs nix-hash on PATH
   # (install-nix-action in ci.yml); without it the pipe is skipped, not failed.
+  # Never a source-built flake package instead: the binary embeds the Vite
+  # build, and nixpkgs has no bun-lockfile fetcher (buildNpmPackage needs a
+  # package-lock.json, which bun.lock replaces).
   - name: parse-dmarc
     repository:
       owner: dmarcguardhq

@@ -1,3 +1,12 @@
+{{- /*
+  Goreleaser appends this footer to each GitHub release (release.mode: append,
+  --release-notes-tmpl in ci.yml) and renders it with missingkey=error: an
+  unknown field fails the release. --snapshot skips this template, so render
+  it for real after editing: goreleaser release --skip=validate,announce
+  --release-notes-tmpl .github/release-notes.md, with a throwaway --config that
+  sets release.disable: true and a publishers entry whose env carries
+  NOTES={{ .ReleaseNotes }}.
+*/ -}}
 {{- /* owner/repo from the checkout remote: https://github.com/o/r in CI, git@github.com:o/r.git locally */ -}}
 {{- $slug := trimsuffix (trimprefix (trimprefix .GitURL "https://github.com/") "git@github.com:") ".git" -}}
 {{- $repo := printf "https://github.com/%s" $slug -}}

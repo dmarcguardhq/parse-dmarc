@@ -88,7 +88,7 @@ To disable the metrics endpoint:
 export PARSE_DMARC_METRICS=false
 
 # Docker
-docker run -e PARSE_DMARC_METRICS=false ghcr.io/dmarcguardhq/parse-dmarc:v1
+docker run -e PARSE_DMARC_METRICS=false ghcr.io/dmarcguardhq/parse-dmarc:latest
 ```
 
 ## Prometheus configuration
@@ -275,7 +275,7 @@ Complete monitoring stack:
 ```yaml
 services:
   parse-dmarc:
-    image: ghcr.io/dmarcguardhq/parse-dmarc:v1
+    image: ghcr.io/dmarcguardhq/parse-dmarc:latest
     ports:
       - "8080:8080"
     volumes:

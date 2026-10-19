@@ -7,9 +7,9 @@ server. User docs: `README.md`, `docs/`; contributor setup: `CONTRIBUTING.md`.
 ## Hard rules
 
 - The product is "Parse DMARC". Never call it DMARCguard or a self-hosted or
-  community edition of it, never imply feature parity or a gated tier. The
-  README's one comparison section is the only place the paid product appears;
-  its links carry
+  community edition of it, never imply feature parity or a gated tier. The paid
+  product appears only in the README's header line, comparison section and
+  footer; each link carries
   `utm_source=github&utm_medium=referral&utm_campaign=parse-dmarc-readme` and a
   `utm_content` naming the slot.
 - Copy states only what code proves: counts, caps and defaults come from the

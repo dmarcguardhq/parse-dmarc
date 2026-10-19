@@ -21,7 +21,7 @@ parse-dmarc --mcp-http :8081 --config config.json
 Docker, sharing the volume with a running instance:
 
 ```bash
-docker run --rm -i -v parse-dmarc:/data ghcr.io/dmarcguardhq/parse-dmarc:v1 --mcp
+docker run --rm -i -v parse-dmarc:/data ghcr.io/dmarcguardhq/parse-dmarc:latest --mcp
 ```
 
 Every flag has an environment variable: `PARSE_DMARC_MCP=true`, `PARSE_DMARC_MCP_HTTP=:8081`.

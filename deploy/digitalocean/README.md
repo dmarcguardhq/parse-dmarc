@@ -84,8 +84,9 @@ When a user creates a Droplet from this image:
 ## Settings
 
 The service reads `/etc/parse-dmarc/config.json` (step 2 above); systemd does not pass
-`/etc/environment` to it. Every key and its environment variable is in the
-[README](../../README.md#configuration).
+`/etc/environment` to it. `parse-dmarc --gen-config -c /tmp/config.json` writes
+a file with every key; the [README](../../README.md#configuration) says what
+each setting does.
 
 ## Service Management
 

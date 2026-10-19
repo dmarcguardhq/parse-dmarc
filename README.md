@@ -58,7 +58,7 @@ docker run -d --name parse-dmarc -p 8080:8080 \
   -e IMAP_USERNAME=dmarc@example.com \
   -e IMAP_PASSWORD='your-app-password' \
   -v parse-dmarc:/data \
-  dmarcguard/parse-dmarc:v1
+  dmarcguard/parse-dmarc
 ```
 
 Homebrew on macOS or Linux:
@@ -194,7 +194,7 @@ Run Parse DMARC when you want the data on your own disk and one mailbox to watch
 
 ## Roadmap and contributing
 
-The most-asked additions, in the order people ask: TLS-RPT reports ([#154](https://github.com/dmarcguardhq/parse-dmarc/issues/154)) and whois on sending sources ([#143](https://github.com/dmarcguardhq/parse-dmarc/issues/143)). [Open issues](https://github.com/dmarcguardhq/parse-dmarc/issues) have the rest. [CONTRIBUTING.md](CONTRIBUTING.md) covers the toolchain: `just build`, `just dev`, and `docker compose up` for a local Dovecot seeded with a sample report.
+The most-asked additions, in the order people ask: TLS-RPT reports ([#154](https://github.com/dmarcguardhq/parse-dmarc/issues/154)) and whois on sending sources ([#143](https://github.com/dmarcguardhq/parse-dmarc/issues/143)). Anything else: [open an issue](https://github.com/dmarcguardhq/parse-dmarc/issues/new). [CONTRIBUTING.md](CONTRIBUTING.md) covers the toolchain: `just build`, `just dev`, and `docker compose up` for a local Dovecot seeded with a sample report.
 
 ## License
 
@@ -204,4 +204,4 @@ Apache-2.0, for everything in this repository. There is no `ee/` directory and n
 
 If Parse DMARC did the job, a star helps the next person find it. If you would rather have the reports read for you, [DMARCguard](https://dmarcguard.io/?utm_source=github&utm_medium=referral&utm_campaign=parse-dmarc-readme&utm_content=footer) is the hosted product from the same team.
 
-[koyeb-1click]: https://app.koyeb.com/deploy?name=parse-dmarc&type=docker&image=docker.io%2Fdmarcguard%2Fparse-dmarc%3Av1&regions=fra&env%5BDATABASE_PATH%5D=%2Fdata%2Fdb.sqlite&env%5BIMAP_HOST%5D=&env%5BIMAP_MAILBOX%5D=INBOX&env%5BIMAP_PASSWORD%5D=&env%5BIMAP_PORT%5D=993&env%5BIMAP_USERNAME%5D=&env%5BIMAP_USE_TLS%5D=true&env%5BSERVER_PORT%5D=8080&ports=8080%3Bhttp%3B%2F&hc_protocol%5B8080%5D=http&hc_grace_period%5B8080%5D=5&hc_interval%5B8080%5D=30&hc_restart_limit%5B8080%5D=3&hc_timeout%5B8080%5D=5&hc_path%5B8080%5D=%2Fapi%2Fstatistics&hc_method%5B8080%5D=get
+[koyeb-1click]: https://app.koyeb.com/deploy?name=parse-dmarc&type=docker&image=docker.io%2Fdmarcguard%2Fparse-dmarc%3Alatest&regions=fra&env%5BDATABASE_PATH%5D=%2Fdata%2Fdb.sqlite&env%5BIMAP_HOST%5D=&env%5BIMAP_MAILBOX%5D=INBOX&env%5BIMAP_PASSWORD%5D=&env%5BIMAP_PORT%5D=993&env%5BIMAP_USERNAME%5D=&env%5BIMAP_USE_TLS%5D=true&env%5BSERVER_PORT%5D=8080&ports=8080%3Bhttp%3B%2F&hc_protocol%5B8080%5D=http&hc_grace_period%5B8080%5D=5&hc_interval%5B8080%5D=30&hc_restart_limit%5B8080%5D=3&hc_timeout%5B8080%5D=5&hc_path%5B8080%5D=%2Fapi%2Fstatistics&hc_method%5B8080%5D=get

@@ -6,6 +6,8 @@
 !go.sum
 !index.html
 !internal
+# A local build's output; the image builds its own frontend.
+internal/api/dist
 !package*.json
 !public
 !README.md

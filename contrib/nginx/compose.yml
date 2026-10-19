@@ -1,0 +1,33 @@
+---
+# parse-dmarc behind nginx under /dmarc/, built from this checkout.
+# Try it by hand: docker compose -f contrib/nginx/compose.yml up --build,
+# then open http://localhost:8088/dmarc/. contrib/nginx/e2e.sh runs the
+# same stack and checks it in headless Chrome.
+services:
+  parse-dmarc:
+    build: ../..
+    command: ["--serve-only"]
+
+  nginx:
+    image: nginx:1.30.5-alpine
+    depends_on:
+      - parse-dmarc
+    ports:
+      - "${NGINX_PORT:-8088}:80"
+    volumes:
+      - ./default.conf:/etc/nginx/conf.d/default.conf:ro
+
+  # Used by e2e.sh only: loads the dashboard in headless Chrome.
+  browser:
+    image: ghcr.io/puppeteer/puppeteer:25.12.0
+    profiles: ["e2e"]
+    depends_on:
+      - nginx
+    volumes:
+      # Beside the image's node_modules, so `import "puppeteer"` resolves.
+      - ./check.mjs:/home/pptruser/check.mjs:ro
+    command:
+      - node
+      - check.mjs
+      - http://nginx/dmarc
+      - http://nginx/dmarc/index.html

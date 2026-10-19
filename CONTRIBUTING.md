@@ -34,6 +34,7 @@ internal/parser/     aggregate report XML parser
 internal/storage/    SQLite, pure-Go by default, cgo behind the `cgo` build tag
 src/                 Vue 3 dashboard
 contrib/dovecot/     local IMAP fixture with a seeded sample report
+contrib/nginx/       dashboard behind nginx under /dmarc/; e2e.sh checks it in headless Chrome
 deploy/              CapRover, Coolify, Dokploy, DigitalOcean templates
 grafana/             dashboard and provisioning
 docs/                METRICS.md, MCP.md

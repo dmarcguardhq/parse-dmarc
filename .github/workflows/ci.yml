@@ -108,6 +108,20 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
+  # The dashboard behind real nginx under /dmarc/, in headless Chrome: fails
+  # when an asset or API URL stops being relative to the page.
+  e2e-nginx:
+    if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: Run contrib/nginx/e2e.sh
+        run: contrib/nginx/e2e.sh
+
   # The ONE required status check on main (ruleset), on the PR and on the
   # merge group alike, so adding or renaming a job never touches the
   # ruleset: list it under needs: here. A skipped job passes; failure and
@@ -121,6 +135,7 @@ jobs:
       - checks
       - test
       - simulate-prod
+      - e2e-nginx
     runs-on: ubuntu-latest
     timeout-minutes: 2
     permissions: {}

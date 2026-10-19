@@ -50,7 +50,7 @@ install: build
     sudo cp bin/parse-dmarc /usr/local/bin/
 
 frontend-dev:
-    bun run dev
+    bun run start
 
 update-zeabur-template:
     bunx zeabur@latest template update -f zeabur.yml -c YB3TS7

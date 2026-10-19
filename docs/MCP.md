@@ -12,7 +12,7 @@ Over stdio, for desktop clients that spawn the process:
 parse-dmarc --mcp --config config.json
 ```
 
-Over HTTP with SSE, for remote clients:
+Over Streamable HTTP, served at the root path of the `--mcp-http` address, for remote clients:
 
 ```bash
 parse-dmarc --mcp-http :8081 --config config.json
@@ -21,7 +21,7 @@ parse-dmarc --mcp-http :8081 --config config.json
 Docker, sharing the volume with a running instance:
 
 ```bash
-docker run --rm -i -v parse-dmarc:/data ghcr.io/dmarcguardhq/parse-dmarc:latest --mcp
+docker run --rm -i -v parse-dmarc:/data ghcr.io/dmarcguardhq/parse-dmarc:v1 --mcp
 ```
 
 Every flag has an environment variable: `PARSE_DMARC_MCP=true`, `PARSE_DMARC_MCP_HTTP=:8081`.

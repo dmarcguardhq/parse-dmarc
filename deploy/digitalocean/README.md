@@ -81,19 +81,11 @@ When a user creates a Droplet from this image:
    ```
 4. Dashboard is available at `http://<droplet-ip>:8080`
 
-## Environment Variables
+## Settings
 
-Users can also configure via environment variables in `/etc/environment`:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `IMAP_HOST` | IMAP server hostname | (required) |
-| `IMAP_USERNAME` | IMAP login username | (required) |
-| `IMAP_PASSWORD` | IMAP login password | (required) |
-| `IMAP_PORT` | IMAP server port | 993 |
-| `IMAP_MAILBOX` | Mailbox to fetch from | INBOX |
-| `IMAP_USE_TLS` | Use TLS connection | true |
-| `SERVER_PORT` | Dashboard port | 8080 |
+The service reads `/etc/parse-dmarc/config.json` (step 2 above); systemd does not pass
+`/etc/environment` to it. Every key and its environment variable is in the
+[README](../../README.md#configuration).
 
 ## Service Management
 

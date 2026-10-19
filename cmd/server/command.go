@@ -97,7 +97,7 @@ func Command(version, commit, date, builtBy string) *cli.Command {
 			},
 			&cli.StringFlag{
 				Name:        "mcp-http",
-				Usage:       "Run MCP server over HTTP/SSE at the specified address (e.g., :8081)",
+				Usage:       "Run MCP server over Streamable HTTP at the specified address (e.g., :8081)",
 				Sources:     cli.EnvVars("PARSE_DMARC_MCP_HTTP"),
 				Destination: &mcpHTTPAddr,
 			},

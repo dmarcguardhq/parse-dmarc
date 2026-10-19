@@ -2,8 +2,6 @@
 
 Parse DMARC exposes Prometheus metrics at `/metrics` (on by default, `--metrics=false` turns it off) and ships a Grafana dashboard in `grafana/dashboard.json`. This page is the full catalogue plus scrape, alert and provisioning examples. The README has the summary.
 
-Parse DMARC includes production-ready Prometheus metrics for monitoring and alerting. Metrics are enabled by default and exposed at `/metrics`.
-
 ## Available metrics
 
 ### Build Information
@@ -90,7 +88,7 @@ To disable the metrics endpoint:
 export PARSE_DMARC_METRICS=false
 
 # Docker
-docker run -e PARSE_DMARC_METRICS=false ghcr.io/dmarcguardhq/parse-dmarc:latest
+docker run -e PARSE_DMARC_METRICS=false ghcr.io/dmarcguardhq/parse-dmarc:v1
 ```
 
 ## Prometheus configuration
@@ -277,7 +275,7 @@ Complete monitoring stack:
 ```yaml
 services:
   parse-dmarc:
-    image: ghcr.io/dmarcguardhq/parse-dmarc:latest
+    image: ghcr.io/dmarcguardhq/parse-dmarc:v1
     ports:
       - "8080:8080"
     volumes:

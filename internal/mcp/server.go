@@ -23,7 +23,7 @@ type Server struct {
 
 // Config holds MCP server configuration.
 type Config struct {
-	// HTTPAddr is the address for HTTP/SSE transport. If empty, only stdio is used.
+	// HTTPAddr is the address for the Streamable HTTP transport. If empty, only stdio is used.
 	HTTPAddr string
 	// Version info for the server implementation.
 	Version string
@@ -131,7 +131,7 @@ func (s *Server) RunStdio(ctx context.Context) error {
 	return s.mcpServer.Run(ctx, &mcp.StdioTransport{})
 }
 
-// RunHTTP runs the MCP server over HTTP/SSE transport.
+// RunHTTP runs the MCP server over the Streamable HTTP transport.
 func (s *Server) RunHTTP(ctx context.Context, addr string, oauthCfg *oauth.Config) error {
 	mcpHandler := mcp.NewStreamableHTTPHandler(func(*http.Request) *mcp.Server {
 		return s.mcpServer

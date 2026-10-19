@@ -8,7 +8,6 @@ import { createHtmlPlugin } from "vite-plugin-html";
 var __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
-  publicDir: path.resolve(__dirname, "./assets"),
   plugins: [
     vue(),
     createHtmlPlugin({

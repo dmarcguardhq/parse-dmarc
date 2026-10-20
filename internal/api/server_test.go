@@ -3,8 +3,10 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/rs/zerolog"
 
@@ -64,5 +66,32 @@ func TestHandleReportsLimitCapped(t *testing.T) {
 				t.Errorf("got %d reports, want %d", len(reports), tc.want)
 			}
 		})
+	}
+}
+
+// TestNewHTTPServerBoundsSlowClients pins the read/write/idle timeouts and the
+// header cap the dashboard server shares with the MCP server
+// (internal/mcp/server.go). Without them every TCP connection can be held open
+// indefinitely.
+func TestNewHTTPServerBoundsSlowClients(t *testing.T) {
+	srv := newHTTPServer("127.0.0.1:0", http.NotFoundHandler())
+
+	timeouts := []struct {
+		name string
+		got  time.Duration
+		want time.Duration
+	}{
+		{"ReadTimeout", srv.ReadTimeout, 15 * time.Second},
+		{"WriteTimeout", srv.WriteTimeout, 15 * time.Second},
+		{"IdleTimeout", srv.IdleTimeout, 60 * time.Second},
+	}
+	for _, tt := range timeouts {
+		if tt.got != tt.want {
+			t.Errorf("%s = %v, want %v", tt.name, tt.got, tt.want)
+		}
+	}
+
+	if srv.MaxHeaderBytes != 1<<20 {
+		t.Errorf("MaxHeaderBytes = %d, want %d", srv.MaxHeaderBytes, 1<<20)
 	}
 }

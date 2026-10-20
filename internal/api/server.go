@@ -91,10 +91,7 @@ func (s *Server) Start(ctx context.Context) error {
 	}
 	handler = s.corsMiddleware(handler)
 
-	server := &http.Server{
-		Addr:    s.addr,
-		Handler: handler,
-	}
+	server := newHTTPServer(s.addr, handler)
 
 	go func() {
 		<-ctx.Done()
@@ -112,6 +109,29 @@ func (s *Server) Start(ctx context.Context) error {
 		return fmt.Errorf("HTTP server listen on %s: %w", s.addr, err)
 	}
 	return nil
+}
+
+// Timeouts of the dashboard HTTP server. They mirror the ones the MCP server
+// sets in internal/mcp/server.go, so both operator-facing surfaces bound idle
+// and slow clients the same way.
+const (
+	readTimeout    = 15 * time.Second
+	writeTimeout   = 15 * time.Second
+	idleTimeout    = 60 * time.Second
+	maxHeaderBytes = 1 << 20 // 1 MiB
+)
+
+// newHTTPServer builds the dashboard server with the same slow-client bounds
+// the MCP server applies.
+func newHTTPServer(addr string, handler http.Handler) *http.Server {
+	return &http.Server{
+		Addr:           addr,
+		Handler:        handler,
+		ReadTimeout:    readTimeout,
+		WriteTimeout:   writeTimeout,
+		IdleTimeout:    idleTimeout,
+		MaxHeaderBytes: maxHeaderBytes,
+	}
 }
 
 // corsMiddleware adds CORS headers

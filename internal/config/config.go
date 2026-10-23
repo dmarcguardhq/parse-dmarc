@@ -68,10 +68,20 @@ type DatabaseConfig struct {
 	Path string `json:"path" env:"DATABASE_PATH"`
 }
 
+// DefaultServerHost is the interface the dashboard binds when SERVER_HOST is
+// left unset. Loopback keeps the dashboard on the machine that runs it, because
+// the reports it serves name the domains and sending hosts collected from the
+// mailbox. Reaching it from elsewhere is then a deliberate act:
+// SERVER_HOST=0.0.0.0, which the container images set for the port mapping to
+// work.
+const DefaultServerHost = "127.0.0.1"
+
 // ServerConfig holds web server configuration
 type ServerConfig struct {
-	Port int    `json:"port" env:"SERVER_PORT" envDefault:"8080"`
-	Host string `json:"host" env:"SERVER_HOST" envDefault:""`
+	Port int `json:"port" env:"SERVER_PORT" envDefault:"8080"`
+	// Host is omitted from a sample config on purpose: the JSON file overrides
+	// the environment, so pinning it there would silently beat SERVER_HOST.
+	Host string `json:"host,omitempty" env:"SERVER_HOST" envDefault:""`
 }
 
 func defaultDBPath() (string, error) {
@@ -143,6 +153,9 @@ func Load(path string) (*Config, error) {
 	if cfg.Server.Port == 0 {
 		cfg.Server.Port = 8080
 	}
+	if cfg.Server.Host == "" {
+		cfg.Server.Host = DefaultServerHost
+	}
 
 	return &cfg, nil
 }
@@ -192,7 +205,6 @@ func GenerateSample(path string) error {
 		},
 		Server: ServerConfig{
 			Port: 8080,
-			Host: "0.0.0.0",
 		},
 	}
 

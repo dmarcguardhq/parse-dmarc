@@ -140,9 +140,11 @@ Every setting in this table is an environment variable or a key in `config.json`
 | Maildir intake instead of IMAP | `MAILDIR_PATH`                   | unset                                                        |
 | Maildir deadletter mailbox     | `IMAP_DEADLETTER_BOX`            | `DEADLETTER`                                                 |
 | Database file                  | `DATABASE_PATH`                  | `~/.parse-dmarc/db.sqlite`, `/data/parse-dmarc.db` in Docker |
-| HTTP listen                    | `SERVER_HOST`, `SERVER_PORT`     | all interfaces, `8080`                                       |
+| HTTP listen                    | `SERVER_HOST`, `SERVER_PORT`     | `127.0.0.1`, `8080`, `0.0.0.0` in Docker                     |
 | Seconds between fetches        | `FETCH_INTERVAL`                 | `300`                                                        |
 | Log level                      | `LOG_LEVEL`                      | `info`                                                       |
+
+The dashboard listens on loopback unless `SERVER_HOST` says otherwise. Set `SERVER_HOST=0.0.0.0` to reach it from another host; the container images already do, since Docker forwards the port to the container's interface rather than its loopback. A `server.host` in the config file overrides `SERVER_HOST`, which is why the sample config leaves the key out.
 
 Providers: Gmail is `imap.gmail.com` on 993 with an App Password. Microsoft 365 is `outlook.office365.com` on 993. Anything else is port 993 with TLS unless its documentation says otherwise.
 

@@ -42,7 +42,8 @@ FROM scratch AS final
 
 VOLUME /data
 ENV PARSE_DMARC_CONFIG=/app/config.json \
-    DATABASE_PATH=/data/parse-dmarc.db
+    DATABASE_PATH=/data/parse-dmarc.db \
+    SERVER_HOST=0.0.0.0
 
 COPY --from=backend-builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=backend-builder /app/parse-dmarc /usr/local/bin/parse-dmarc

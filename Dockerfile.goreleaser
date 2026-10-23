@@ -4,7 +4,8 @@ ARG TARGETPLATFORM
 
 VOLUME /data
 ENV PARSE_DMARC_CONFIG=/app/config.json \
-    DATABASE_PATH=/data/parse-dmarc.db
+    DATABASE_PATH=/data/parse-dmarc.db \
+    SERVER_HOST=0.0.0.0
 
 COPY $TARGETPLATFORM/parse-dmarc /app/parse-dmarc
 

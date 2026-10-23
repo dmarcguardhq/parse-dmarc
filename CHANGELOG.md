@@ -1,5 +1,34 @@
 # Changelog
 
+## [1.7.2](https://github.com/dmarcguardhq/parse-dmarc/compare/v1.7.1...v1.7.2) (2026-10-23)
+
+
+### Bug Fixes
+
+* **api:** cap the reports pagination limit ([#221](https://github.com/dmarcguardhq/parse-dmarc/issues/221)) ([cf07c02](https://github.com/dmarcguardhq/parse-dmarc/commit/cf07c0206948d1cebf77b425db412a9570d0effd))
+* **dashboard:** load assets and API relative to the page ([#226](https://github.com/dmarcguardhq/parse-dmarc/issues/226)) ([66dee65](https://github.com/dmarcguardhq/parse-dmarc/commit/66dee652e99922ee82c401b7c19567201d9d9cc1))
+* **dashboard:** ship the favicons instead of the README images ([#227](https://github.com/dmarcguardhq/parse-dmarc/issues/227)) ([c6b59c7](https://github.com/dmarcguardhq/parse-dmarc/commit/c6b59c797a1eee166cb4b34ed6a1908bbaa3ff8c))
+* declare module path github.com/dmarcguardhq/parse-dmarc ([#219](https://github.com/dmarcguardhq/parse-dmarc/issues/219)) ([a081972](https://github.com/dmarcguardhq/parse-dmarc/commit/a081972a738c75a291291de833fe4802265f2d08)), closes [#218](https://github.com/dmarcguardhq/parse-dmarc/issues/218)
+* **security:** build with Go 1.26.10 so TLS rejects the compromised eMudhra CAs ([#232](https://github.com/dmarcguardhq/parse-dmarc/issues/232)) ([988b285](https://github.com/dmarcguardhq/parse-dmarc/commit/988b2857f155c4cdcafdfe5ca5b16f402f9e1506))
+
+
+### Build & Dependencies
+
+* **deps:** update module github.com/goccy/go-json to v0.11.2 ([#224](https://github.com/dmarcguardhq/parse-dmarc/issues/224)) ([2fc6a46](https://github.com/dmarcguardhq/parse-dmarc/commit/2fc6a469383a31ec5f1824c07171f6ff065adb14))
+* **deps:** update module github.com/urfave/cli/v3 to v3.14.0 ([#225](https://github.com/dmarcguardhq/parse-dmarc/issues/225)) ([bcf436f](https://github.com/dmarcguardhq/parse-dmarc/commit/bcf436f1c96ce04dfbeed2e6b095bb1685399756))
+
+
+### Chores
+
+* **ci:** detect OS and arch in the release-notes install snippet ([#222](https://github.com/dmarcguardhq/parse-dmarc/issues/222)) ([beeaf9a](https://github.com/dmarcguardhq/parse-dmarc/commit/beeaf9ab5f979b6703b0e35eb59af005a433c47d))
+* **ci:** run the nginx subpath e2e in ci-gate ([#228](https://github.com/dmarcguardhq/parse-dmarc/issues/228)) ([deac26e](https://github.com/dmarcguardhq/parse-dmarc/commit/deac26ed3ee1b6be5b9e27438283d46eff1e78d9))
+* **docs:** use docker hub as default documented image ([30cec87](https://github.com/dmarcguardhq/parse-dmarc/commit/30cec87df5f9db3286cddb7ca8652e7d54fd52fa))
+
+
+### Documentation
+
+* cut CLAUDE.md to guardrails, drop ROADMAP.md, fix stale docs ([#229](https://github.com/dmarcguardhq/parse-dmarc/issues/229)) ([355ee0c](https://github.com/dmarcguardhq/parse-dmarc/commit/355ee0cbfeddef107c78300372ae87da3db305f7))
+
 ## [1.7.1](https://github.com/dmarcguardhq/parse-dmarc/compare/v1.7.0...v1.7.1) (2026-10-14)
 
 

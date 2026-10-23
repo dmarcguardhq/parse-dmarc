@@ -21,6 +21,8 @@ server. User docs: `README.md`, `docs/`; contributor setup: `CONTRIBUTING.md`.
 - `bun.lock` is the only lockfile; never add `package-lock.json`.
 - `.github/release-notes.md` renders with `missingkey=error`: an unknown field
   fails the release. Render it after editing (the template's header comment).
+- Custom text in a release PR body goes below its `## [x.y.z]` heading: above
+  it, release-please publishes an empty release and `build-prod` fails.
 - Nix ships the released binary through goreleaser's `nix:` pipe; never a
   source-built flake package.
 - A changed flag, env var, metric or MCP tool updates `README.md` or `docs/` in

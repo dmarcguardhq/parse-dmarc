@@ -216,6 +216,19 @@ jobs:
       packages: write
       pull-requests: write
     steps:
+      # release-please publishes an empty release when it cannot parse the
+      # release PR body (text above the `## [x.y.z]` heading); goreleaser's
+      # append mode would then ship the footer alone.
+      - name: Require release notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.release-please.outputs.tag_name }}
+        run: |
+          body=$(gh release view "$TAG" -R "$GITHUB_REPOSITORY" --json body -q .body)
+          if [ -z "${body//[[:space:]]/}" ]; then
+            echo "::error::Release $TAG has no notes: release-please could not parse the release PR body (custom text must go below the '## [x.y.z]' heading). Copy the PR's notes into the release, then re-run this job."
+            exit 1
+          fi
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:

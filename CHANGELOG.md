@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.7.3](https://github.com/dmarcguardhq/parse-dmarc/compare/v1.7.2...v1.7.3) (2026-10-23)
+
+
+### Bug Fixes
+
+* **api:** bound the dashboard HTTP server timeouts ([#230](https://github.com/dmarcguardhq/parse-dmarc/issues/230)) ([467d601](https://github.com/dmarcguardhq/parse-dmarc/commit/467d6012d2534a6f1df7b85044b9efd41a36d94c))
+* **config:** bind the dashboard to loopback unless SERVER_HOST is set ([#233](https://github.com/dmarcguardhq/parse-dmarc/issues/233)) ([daff2af](https://github.com/dmarcguardhq/parse-dmarc/commit/daff2af754ed8c814a4f3f39fc87c94ebf368ff4))
+
+
+### Chores
+
+* **ci:** fail build-prod when the release has no notes ([#235](https://github.com/dmarcguardhq/parse-dmarc/issues/235)) ([ab260b6](https://github.com/dmarcguardhq/parse-dmarc/commit/ab260b607c49532f6bb5be53a6b90ea21797f6d9))
+
 ## [1.7.2](https://github.com/dmarcguardhq/parse-dmarc/compare/v1.7.1...v1.7.2) (2026-10-23)
 
 

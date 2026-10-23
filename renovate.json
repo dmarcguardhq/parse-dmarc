@@ -1,4 +1,14 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["github>meysam81/.github"]
+  "extends": ["github>meysam81/.github"],
+  "packageRules": [
+    {
+      "description": "Bump the go.mod go directive to each Go release (Renovate reads it as a minimum and skips it by default); Go releases skip the release-age wait so security point releases land promptly",
+      "matchManagers": ["gomod"],
+      "matchDepNames": ["go"],
+      "matchDepTypes": ["golang"],
+      "rangeStrategy": "bump",
+      "minimumReleaseAge": "0 days"
+    }
+  ]
 }

@@ -1,6 +1,6 @@
 module github.com/dmarcguardhq/parse-dmarc
 
-go 1.26.10
+go 1.27.3
 
 require (
 	github.com/caarlos0/env/v11 v11.4.1

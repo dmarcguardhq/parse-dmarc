@@ -83,4 +83,9 @@ export const getReports = ({ limit = 20, offset = 0 } = {}) =>
 export const getReportById = (id) =>
   createApiClient().get(`reports/${id}`).json();
 
+/**
+ * Build the server runs: version, commit and build date
+ */
+export const getVersion = () => createApiClient().get("version").json();
+
 export default createApiClient;

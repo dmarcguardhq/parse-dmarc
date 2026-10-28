@@ -10,6 +10,7 @@ import {
   getTopSources,
   getReports,
   getReportById,
+  getVersion,
 } from "./lib/api.js";
 import { useThemeStore } from "./stores";
 import "./assets/base.css";
@@ -27,6 +28,7 @@ const loadingDetail = ref(false);
 const isDrawerOpen = ref(false);
 const isSettingsOpen = ref(false);
 const currentView = ref("dashboard"); // 'dashboard' | 'generator'
+const buildInfo = ref(null);
 
 // Auto-refresh interval
 let refreshInterval = null;
@@ -120,9 +122,25 @@ const formatNumber = (num) => {
   return new Intl.NumberFormat().format(num);
 };
 
+// Release builds carry a bare semver ("1.7.2"); source builds say "dev".
+const versionLabel = computed(() => {
+  const v = buildInfo.value?.version;
+  if (!v) return "";
+  return /^\d/.test(v) ? `v${v}` : v;
+});
+
+const fetchVersion = async () => {
+  try {
+    buildInfo.value = await getVersion();
+  } catch (error) {
+    console.error("Failed to fetch version:", error);
+  }
+};
+
 // Lifecycle
 onMounted(() => {
   loadData();
+  fetchVersion();
   // Auto-refresh every 5 minutes
   refreshInterval = setInterval(loadData, 5 * 60 * 1000);
 });
@@ -464,6 +482,11 @@ onUnmounted(() => {
         </div>
         <div class="footer-bottom">
           <p>
+            <span
+              v-if="versionLabel"
+              :title="`commit ${buildInfo.commit.slice(0, 7)}, built ${buildInfo.date.slice(0, 10)}`"
+              >Parse DMARC {{ versionLabel }} ·
+            </span>
             Built with
             <a href="https://vuejs.org/" target="_blank" rel="noopener"
               >Vue 3</a

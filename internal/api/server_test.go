@@ -40,7 +40,7 @@ func TestHandleReportsLimitCapped(t *testing.T) {
 	}
 
 	log := zerolog.Nop()
-	srv := NewServer(store, "127.0.0.1", 0, nil, &log)
+	srv := NewServer(store, "127.0.0.1", 0, nil, &log, VersionInfo{})
 
 	for _, tc := range []struct {
 		name string
@@ -66,6 +66,33 @@ func TestHandleReportsLimitCapped(t *testing.T) {
 				t.Errorf("got %d reports, want %d", len(reports), tc.want)
 			}
 		})
+	}
+}
+
+// TestHandleVersion pins the build fields the dashboard footer reads, and
+// that only GET answers.
+func TestHandleVersion(t *testing.T) {
+	log := zerolog.Nop()
+	want := VersionInfo{Version: "1.7.2", Commit: "31a25ef", Date: "2026-10-27T00:00:00Z"}
+	srv := NewServer(nil, "127.0.0.1", 0, nil, &log, want)
+
+	rec := httptest.NewRecorder()
+	srv.handleVersion(rec, httptest.NewRequest("GET", "/api/version", nil))
+	if rec.Code != 200 {
+		t.Fatalf("status = %d, want 200: %s", rec.Code, rec.Body.String())
+	}
+	var got VersionInfo
+	if err := json.Unmarshal(rec.Body.Bytes(), &got); err != nil {
+		t.Fatalf("decode body: %v", err)
+	}
+	if got != want {
+		t.Errorf("got %+v, want %+v", got, want)
+	}
+
+	rec = httptest.NewRecorder()
+	srv.handleVersion(rec, httptest.NewRequest("POST", "/api/version", nil))
+	if rec.Code != http.StatusMethodNotAllowed {
+		t.Errorf("POST status = %d, want %d", rec.Code, http.StatusMethodNotAllowed)
 	}
 }
 

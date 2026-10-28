@@ -70,7 +70,7 @@ func run(ctx context.Context, version, commit, date string) error {
 	ctx, stop := signal.NotifyContext(ctx, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
-	server := api.NewServer(store, cfg.Server.Host, cfg.Server.Port, m, log)
+	server := api.NewServer(store, cfg.Server.Host, cfg.Server.Port, m, log, api.VersionInfo{Version: version, Commit: commit, Date: date})
 	serverErrChan := make(chan error, 1)
 	go func() {
 		serverErrChan <- server.Start(ctx)

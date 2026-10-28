@@ -19,21 +19,30 @@ import (
 //go:embed dist
 var distFS embed.FS
 
+// VersionInfo is the build the server runs, as main's ldflags set it.
+type VersionInfo struct {
+	Version string `json:"version"`
+	Commit  string `json:"commit"`
+	Date    string `json:"date"`
+}
+
 // Server represents the API server
 type Server struct {
 	storage *storage.Storage
 	metrics *metrics.Metrics
 	log     *zerolog.Logger
 	addr    string
+	version VersionInfo
 }
 
 // NewServer creates a new API server
-func NewServer(store *storage.Storage, host string, port int, m *metrics.Metrics, log *zerolog.Logger) *Server {
+func NewServer(store *storage.Storage, host string, port int, m *metrics.Metrics, log *zerolog.Logger, version VersionInfo) *Server {
 	return &Server{
 		storage: store,
 		metrics: m,
 		log:     log,
 		addr:    fmt.Sprintf("%s:%d", host, port),
+		version: version,
 	}
 }
 
@@ -46,6 +55,7 @@ func (s *Server) Start(ctx context.Context) error {
 	mux.HandleFunc("/api/reports/", s.handleReportDetail)
 	mux.HandleFunc("/api/statistics", s.handleStatistics)
 	mux.HandleFunc("/api/top-sources", s.handleTopSources)
+	mux.HandleFunc("/api/version", s.handleVersion)
 
 	// Prometheus metrics endpoint
 	if s.metrics != nil {
@@ -246,6 +256,16 @@ func (s *Server) handleTopSources(w http.ResponseWriter, r *http.Request) {
 	}
 
 	s.writeJSON(w, sources)
+}
+
+// handleVersion returns the build the server runs
+func (s *Server) handleVersion(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	s.writeJSON(w, s.version)
 }
 
 // writeJSON writes JSON response

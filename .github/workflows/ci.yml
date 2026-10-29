@@ -160,7 +160,7 @@ jobs:
       id-token: write
     steps:
       - name: Build docker
-        uses: meysam81/build-docker@21c3eacd4b1883d3efbeb1d7b174d339b4771323 # main
+        uses: meysam81/build-docker@4702dd58cc9a0c0499fbdfe1e1bf8c23d4bc7c8c # main
         with:
           build-args: |
             VERSION=head-${{ github.sha }}

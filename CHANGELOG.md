@@ -1,5 +1,38 @@
 # Changelog
 
+## [1.8.0](https://github.com/dmarcguardhq/parse-dmarc/compare/v1.7.2...v1.8.0) (2026-10-29)
+
+
+### Features
+
+* **dashboard:** show the running version in the footer ([#243](https://github.com/dmarcguardhq/parse-dmarc/issues/243)) ([66d1c27](https://github.com/dmarcguardhq/parse-dmarc/commit/66d1c2756afe7db8646bbd339e890e116606ca03)), closes [#241](https://github.com/dmarcguardhq/parse-dmarc/issues/241)
+* **deps-security:** update module github.com/go-jose/go-jose/v4 to v4.1.6 [security] ([#242](https://github.com/dmarcguardhq/parse-dmarc/issues/242)) ([6baa8de](https://github.com/dmarcguardhq/parse-dmarc/commit/6baa8de18f917caa8360d6f80492349e95944bb1))
+* **deps-security:** update module golang.org/x/text to v0.41.0 [security] ([#239](https://github.com/dmarcguardhq/parse-dmarc/issues/239)) ([a058c12](https://github.com/dmarcguardhq/parse-dmarc/commit/a058c129268fe75e2515064c1960ccddb5f45165))
+
+
+### Bug Fixes
+
+* **api:** bound the dashboard HTTP server timeouts ([#230](https://github.com/dmarcguardhq/parse-dmarc/issues/230)) ([467d601](https://github.com/dmarcguardhq/parse-dmarc/commit/467d6012d2534a6f1df7b85044b9efd41a36d94c))
+* **config:** bind the dashboard to loopback unless SERVER_HOST is set ([#233](https://github.com/dmarcguardhq/parse-dmarc/issues/233)) ([daff2af](https://github.com/dmarcguardhq/parse-dmarc/commit/daff2af754ed8c814a4f3f39fc87c94ebf368ff4))
+
+
+### Build & Dependencies
+
+* **deps:** update go module directive to v1.27.3 ([#237](https://github.com/dmarcguardhq/parse-dmarc/issues/237)) ([045cfa7](https://github.com/dmarcguardhq/parse-dmarc/commit/045cfa7b9fb252d0c7d1cd668b3590b59ba8d791))
+* **deps:** update module github.com/prometheus/client_golang to v1.25.0 ([#238](https://github.com/dmarcguardhq/parse-dmarc/issues/238)) ([adae529](https://github.com/dmarcguardhq/parse-dmarc/commit/adae529f137737b444cf9ffbc457d2d146593c8e))
+
+
+### Chores
+
+* **ci:** fail build-prod when the release has no notes ([#235](https://github.com/dmarcguardhq/parse-dmarc/issues/235)) ([ab260b6](https://github.com/dmarcguardhq/parse-dmarc/commit/ab260b607c49532f6bb5be53a6b90ea21797f6d9))
+* **deps:** do not wait for golang min age ([31a25ef](https://github.com/dmarcguardhq/parse-dmarc/commit/31a25ef914093d29b8ea098b9c7fcbd8fe240efb))
+* **renovate:** bump the go.mod go directive on new Go releases ([#236](https://github.com/dmarcguardhq/parse-dmarc/issues/236)) ([06f1576](https://github.com/dmarcguardhq/parse-dmarc/commit/06f1576cd0e1218e0c6debb624d767c21418bb8b))
+
+
+### CI
+
+* bump build-docker to the SHA-pinned release so build-docker runs under the pinning policy ([#244](https://github.com/dmarcguardhq/parse-dmarc/issues/244)) ([747abed](https://github.com/dmarcguardhq/parse-dmarc/commit/747abed3cc9ac24ed0a38d73758d9963ff4a6602))
+
 ## [1.7.2](https://github.com/dmarcguardhq/parse-dmarc/compare/v1.7.1...v1.7.2) (2026-10-23)
 
 

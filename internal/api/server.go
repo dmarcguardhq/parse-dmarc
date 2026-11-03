@@ -19,6 +19,10 @@ import (
 //go:embed dist
 var distFS embed.FS
 
+// maxAPILimit caps the rows a single response can hold. The MCP tool caps the
+// same query at the same ceiling.
+const maxAPILimit = 100
+
 // Server represents the API server
 type Server struct {
 	storage *storage.Storage
@@ -138,14 +142,8 @@ func (s *Server) handleReports(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Parse pagination parameters
-	limit := 50
+	limit := parseLimit(r.URL.Query().Get("limit"), 50, maxAPILimit)
 	offset := 0
-
-	if limitStr := r.URL.Query().Get("limit"); limitStr != "" {
-		if l, err := strconv.Atoi(limitStr); err == nil && l > 0 {
-			limit = l
-		}
-	}
 
 	if offsetStr := r.URL.Query().Get("offset"); offsetStr != "" {
 		if o, err := strconv.Atoi(offsetStr); err == nil && o >= 0 {
@@ -160,6 +158,19 @@ func (s *Server) handleReports(w http.ResponseWriter, r *http.Request) {
 	}
 
 	s.writeJSON(w, reports)
+}
+
+// parseLimit reads a limit query parameter, falling back to def when it is
+// absent or invalid and never exceeding maxLimit.
+func parseLimit(raw string, def, maxLimit int) int {
+	limit := def
+	if l, err := strconv.Atoi(raw); err == nil && l > 0 {
+		limit = l
+	}
+	if limit > maxLimit {
+		limit = maxLimit
+	}
+	return limit
 }
 
 // handleReportDetail returns a single report detail

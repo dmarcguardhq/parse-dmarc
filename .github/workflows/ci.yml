@@ -163,7 +163,7 @@ jobs:
         uses: meysam81/build-docker@4702dd58cc9a0c0499fbdfe1e1bf8c23d4bc7c8c # main
         with:
           build-args: |
-            VERSION=head-${{ github.sha }}
+            VERSION=edge
             COMMIT=${{ github.sha }}
             DATE=${{ github.event.head_commit.timestamp }}
             BUILT_BY=github-actions

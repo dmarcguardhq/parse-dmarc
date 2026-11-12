@@ -13,6 +13,7 @@
     "convert-svgs": "^1.0.5",
     "lightningcss": "^1.33.0",
     "loglevel": "^1.9.2",
+    "prettier": "3.9.10",
     "sharp": "^0.35.4",
     "vite": "^8.2.2",
     "vite-plugin-compression2": "^2.5.3",

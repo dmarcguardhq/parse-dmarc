@@ -148,6 +148,8 @@ The dashboard listens on loopback unless `SERVER_HOST` says otherwise. Set `SERV
 
 Providers: Gmail is `imap.gmail.com` on 993 with an App Password. Microsoft 365 is `outlook.office365.com` on 993. Anything else is port 993 with TLS unless its documentation says otherwise.
 
+Note: If using Gmail, to have processed messages moved to the trash, set the `IMAP_PROCESSED_MAILBOX` environment variable to `[Gmail]/Trash`.
+
 An IMAP server whose certificate comes from your own CA fails with `x509: certificate signed by unknown authority`. Mount the CA bundle and point `IMAP_TLS_CA_FILE` at it; verification stays on. `IMAP_TLS_SKIP_VERIFY=true` also connects and is the last resort, because the session can then be intercepted. `IMAP_STARTTLS=true` dials plaintext, usually port 143, and upgrades; it takes precedence over `IMAP_USE_TLS`. Turning TLS off entirely is plaintext IMAP, and most servers refuse `LOGIN` on it.
 
 On a host that already receives the reports, point `MAILDIR_PATH` at the Maildir (for example `/var/mail/dmarc/Maildir`) and no IMAP settings are needed: every fetch reads `<MAILDIR_PATH>/new` and moves each message to `<MAILDIR_PATH>/cur` once it has been parsed. The messages are read as whole emails, exactly as Postfix or Courier deliver them. A message no report can be read from, or whose report does not parse, is moved to `<MAILDIR_PATH>/DEADLETTER` (`IMAP_DEADLETTER_BOX`) instead, so an operator sees what the parser dropped.

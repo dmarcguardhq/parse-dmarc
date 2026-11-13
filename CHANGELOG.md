@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.4](https://github.com/dmarcguardhq/parse-dmarc/compare/v1.7.3...v1.7.4) (2026-11-13)
+
+
+### CI
+
+* pin pre-commit hooks and CI tool versions ([#257](https://github.com/dmarcguardhq/parse-dmarc/issues/257)) ([c264d8e](https://github.com/dmarcguardhq/parse-dmarc/commit/c264d8e664bc023fdbb8c63bc88636b0408f3338))
+
 ## [1.7.3](https://github.com/dmarcguardhq/parse-dmarc/compare/v1.7.2...v1.7.3) (2026-11-08)
 
 

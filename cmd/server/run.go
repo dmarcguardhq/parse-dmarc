@@ -34,8 +34,11 @@ func run(ctx context.Context, version, commit, date string) error {
 		return fmt.Errorf("failed to load config: %w", err)
 	}
 
-	// Reinitialize logger with config-derived level
-	log = logger.NewLogger(cfg.LogLevel, !cfg.ColoredLogs)
+	// Reinitialize logger with config-derived level and format
+	log, err = logger.New(cfg.LogLevel, cfg.LogFormat, !cfg.ColoredLogs)
+	if err != nil {
+		return fmt.Errorf("configuration error: %w", err)
+	}
 
 	// Validate required IMAP configuration when fetching is enabled
 	// (not serve-only and not MCP mode)

@@ -6,8 +6,10 @@ import (
 	"crypto/x509"
 	"fmt"
 	"io"
+	"net"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/dmarcguardhq/parse-dmarc/internal/config"
 	"github.com/emersion/go-imap"
@@ -55,23 +57,44 @@ func (c *Client) tlsConfig() (*tls.Config, error) {
 	return cfg, nil
 }
 
+// DefaultTimeout bounds the connection and each command when
+// IMAP_TIMEOUT_SECONDS is unset.
+const DefaultTimeout = 60 * time.Second
+
+func (c *Client) timeout() time.Duration {
+	if c.config.TimeoutSeconds > 0 {
+		return time.Duration(c.config.TimeoutSeconds) * time.Second
+	}
+	return DefaultTimeout
+}
+
 // dial opens the connection: implicit TLS, plaintext upgraded via STARTTLS, or
-// plaintext. StartTLS wins over UseTLS since UseTLS defaults to true.
+// plaintext. StartTLS wins over UseTLS since UseTLS defaults to true. The
+// timeout bounds the TCP connect and greeting, and then every command, so a
+// server that stops answering ends the fetch instead of hanging it.
 func (c *Client) dial(addr string, tlsCfg *tls.Config) (*client.Client, error) {
+	dialer := &net.Dialer{Timeout: c.timeout()}
+
+	var (
+		imapClient *client.Client
+		err        error
+	)
 	if c.config.UseTLS && !c.config.StartTLS {
-		return client.DialTLS(addr, tlsCfg)
+		imapClient, err = client.DialWithDialerTLS(dialer, addr, tlsCfg)
+	} else {
+		imapClient, err = client.DialWithDialer(dialer, addr)
 	}
-
-	imapClient, err := client.Dial(addr)
-	if err != nil || !c.config.StartTLS {
-		return imapClient, err
+	if err != nil {
+		return nil, err
 	}
+	imapClient.Timeout = c.timeout()
 
-	if err := imapClient.StartTLS(tlsCfg); err != nil {
-		_ = imapClient.Logout()
-		return nil, fmt.Errorf("starttls: %w", err)
+	if c.config.StartTLS {
+		if err := imapClient.StartTLS(tlsCfg); err != nil {
+			_ = imapClient.Logout()
+			return nil, fmt.Errorf("starttls: %w", err)
+		}
 	}
-
 	return imapClient, nil
 }
 

@@ -284,3 +284,31 @@ func TestDialTransportSelection(t *testing.T) {
 		t.Errorf("plaintext: want no unsolicited client traffic, got %q", got)
 	}
 }
+
+// A server that accepts the connection and never greets must not hang the
+// fetch: the timeout ends the dial.
+func TestDialTimesOutOnSilentServer(t *testing.T) {
+	ln, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() { _ = ln.Close() }()
+	go func() {
+		conn, err := ln.Accept()
+		if err != nil {
+			return
+		}
+		defer func() { _ = conn.Close() }()
+		time.Sleep(5 * time.Second)
+	}()
+
+	log := zerolog.Nop()
+	c := &Client{log: &log, config: &config.IMAPConfig{TimeoutSeconds: 1}}
+	start := time.Now()
+	if _, err := c.dial(ln.Addr().String(), nil); err == nil {
+		t.Fatal("want an error from a server that never greets")
+	}
+	if elapsed := time.Since(start); elapsed > 3*time.Second {
+		t.Fatalf("dial took %v, want about the 1s timeout", elapsed)
+	}
+}

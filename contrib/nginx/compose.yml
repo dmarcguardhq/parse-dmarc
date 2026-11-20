@@ -9,7 +9,7 @@ services:
     command: ["--serve-only"]
 
   nginx:
-    image: nginx:1.30.5-alpine
+    image: nginx:1.30.5-alpine@sha256:0985e772fb9f729e6fa0980da05fca5d9c468e870eed43071545afa9d2e27d94
     depends_on:
       - parse-dmarc
     ports:
@@ -19,7 +19,7 @@ services:
 
   # Used by e2e.sh only: loads the dashboard in headless Chrome.
   browser:
-    image: ghcr.io/puppeteer/puppeteer:25.12.0
+    image: ghcr.io/puppeteer/puppeteer:25.12.0@sha256:60ad89b1d8ca14877120250b9c96694dd19a4eda5890fdbad64f4740c6a27361
     profiles: ["e2e"]
     depends_on:
       - nginx

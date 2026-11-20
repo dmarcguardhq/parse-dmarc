@@ -5,7 +5,7 @@ services:
   # under ./contrib/dovecot/seed. Lives in its own service because the
   # dovecot/dovecot image is too minimal to ship mkdir/cp/sed.
   dovecot-init:
-    image: alpine:3.24
+    image: alpine:3.24@sha256:f59abe656b692d901e184be3445e084786602108599d2a51d229c0f5a48c71bf
     restart: on-failure
     volumes:
       - ./contrib/dovecot/init.sh:/init.sh:ro
@@ -17,7 +17,7 @@ services:
   # fetch + parse pipeline. User dmarc:dev, INBOX served from the seeded
   # volume. Reachable from the host on localhost:11143.
   dovecot:
-    image: dovecot/dovecot:2.4.5
+    image: dovecot/dovecot:2.4.5@sha256:a2e908c9a93698f3923104ea5be7f4beacde9586242aff5d8059599d0042c62a
     depends_on:
       dovecot-init:
         condition: service_completed_successfully

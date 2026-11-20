@@ -28,22 +28,45 @@ type VersionInfo struct {
 
 // Server represents the API server
 type Server struct {
-	storage *storage.Storage
-	metrics *metrics.Metrics
-	log     *zerolog.Logger
-	addr    string
-	version VersionInfo
+	storage         *storage.Storage
+	metrics         *metrics.Metrics
+	log             *zerolog.Logger
+	addr            string
+	version         VersionInfo
+	shutdownTimeout time.Duration
+}
+
+// DefaultShutdownTimeout bounds how long in-flight requests may finish once
+// the server is asked to stop.
+const DefaultShutdownTimeout = 10 * time.Second
+
+// Option configures a Server.
+type Option func(*Server)
+
+// WithShutdownTimeout bounds how long in-flight requests may finish on
+// shutdown before their connections are closed.
+func WithShutdownTimeout(d time.Duration) Option {
+	return func(s *Server) {
+		if d > 0 {
+			s.shutdownTimeout = d
+		}
+	}
 }
 
 // NewServer creates a new API server
-func NewServer(store *storage.Storage, host string, port int, m *metrics.Metrics, log *zerolog.Logger, version VersionInfo) *Server {
-	return &Server{
-		storage: store,
-		metrics: m,
-		log:     log,
-		addr:    fmt.Sprintf("%s:%d", host, port),
-		version: version,
+func NewServer(store *storage.Storage, host string, port int, m *metrics.Metrics, log *zerolog.Logger, version VersionInfo, opts ...Option) *Server {
+	s := &Server{
+		storage:         store,
+		metrics:         m,
+		log:             log,
+		addr:            fmt.Sprintf("%s:%d", host, port),
+		version:         version,
+		shutdownTimeout: DefaultShutdownTimeout,
 	}
+	for _, opt := range opts {
+		opt(s)
+	}
+	return s
 }
 
 // Start starts the HTTP server
@@ -103,20 +126,27 @@ func (s *Server) Start(ctx context.Context) error {
 
 	server := newHTTPServer(s.addr, handler)
 
-	go func() {
-		<-ctx.Done()
-		s.log.Info().Msg("shutting down server")
-		shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-		defer cancel()
-		if err := server.Shutdown(shutdownCtx); err != nil {
-			s.log.Error().Err(err).Msg("server shutdown error")
-		}
-	}()
-
 	s.log.Info().Str("addr", s.addr).Msg("starting server")
-	err = server.ListenAndServe()
-	if err != nil && err != http.ErrServerClosed {
-		return fmt.Errorf("HTTP server listen on %s: %w", s.addr, err)
+	served := make(chan error, 1)
+	go func() { served <- server.ListenAndServe() }()
+
+	select {
+	case err := <-served:
+		if err != nil && err != http.ErrServerClosed {
+			return fmt.Errorf("HTTP server listen on %s: %w", s.addr, err)
+		}
+		return nil
+	case <-ctx.Done():
+	}
+
+	// Start returns only once in-flight requests are done, so the caller
+	// can close the store behind them.
+	s.log.Info().Dur("timeout", s.shutdownTimeout).Msg("shutting down server")
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), s.shutdownTimeout)
+	defer cancel()
+	if err := server.Shutdown(shutdownCtx); err != nil {
+		_ = server.Close()
+		return fmt.Errorf("HTTP server shutdown: %w", err)
 	}
 	return nil
 }

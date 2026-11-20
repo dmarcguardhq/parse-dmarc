@@ -56,6 +56,8 @@ func (s *Server) Start(ctx context.Context) error {
 	mux.HandleFunc("/api/statistics", s.handleStatistics)
 	mux.HandleFunc("/api/top-sources", s.handleTopSources)
 	mux.HandleFunc("/api/version", s.handleVersion)
+	mux.HandleFunc("/healthz", s.handleHealthz)
+	mux.HandleFunc("/readyz", s.handleReadyz)
 
 	// Prometheus metrics endpoint
 	if s.metrics != nil {

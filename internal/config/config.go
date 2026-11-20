@@ -78,7 +78,10 @@ const DefaultServerHost = "127.0.0.1"
 
 // ServerConfig holds web server configuration
 type ServerConfig struct {
-	Port int `json:"port" env:"SERVER_PORT" envDefault:"8080"`
+	// CORSAllowedOrigins lists the origins (comma-separated, or "*") that may
+	// read the API from another origin. Empty sends no CORS headers.
+	CORSAllowedOrigins string `json:"cors_allowed_origins" env:"CORS_ALLOWED_ORIGINS"`
+	Port               int    `json:"port" env:"SERVER_PORT" envDefault:"8080"`
 	// Host is omitted from a sample config on purpose: the JSON file overrides
 	// the environment, so pinning it there would silently beat SERVER_HOST.
 	Host string `json:"host,omitempty" env:"SERVER_HOST" envDefault:""`

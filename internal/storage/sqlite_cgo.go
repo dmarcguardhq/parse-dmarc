@@ -6,12 +6,28 @@ import (
 	"database/sql"
 	"fmt"
 
-	_ "github.com/mattn/go-sqlite3"
+	sqlite3 "github.com/mattn/go-sqlite3"
 )
+
+// sqliteDriver is go-sqlite3 with temp_store set on every connection: the
+// driver has no DSN key for it. Temporary tables and sort spills stay in
+// memory, so nothing is written outside the database's directory and the
+// root filesystem can be read-only.
+const sqliteDriver = "sqlite3_parse_dmarc"
+
+// database/sql drivers register by name, once, at program start.
+func init() {
+	sql.Register(sqliteDriver, &sqlite3.SQLiteDriver{
+		ConnectHook: func(c *sqlite3.SQLiteConn) error {
+			_, err := c.Exec("PRAGMA temp_store = MEMORY", nil)
+			return err
+		},
+	})
+}
 
 // NewStorage creates a new storage instance
 func NewStorage(dbPath string) (*Storage, error) {
-	db, err := sql.Open("sqlite3", dbPath)
+	db, err := sql.Open(sqliteDriver, dbPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open database: %w", err)
 	}

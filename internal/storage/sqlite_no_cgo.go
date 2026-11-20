@@ -9,8 +9,11 @@ import (
 	_ "modernc.org/sqlite"
 )
 
+// NewStorage creates a new storage instance. Temporary tables and sort
+// spills stay in memory, so nothing is written outside the database's
+// directory and the root filesystem can be read-only.
 func NewStorage(dbPath string) (*Storage, error) {
-	db, err := sql.Open("sqlite", dbPath)
+	db, err := sql.Open("sqlite", dbPath+"?_pragma=temp_store(memory)")
 	if err != nil {
 		return nil, fmt.Errorf("failed to open database: %w", err)
 	}

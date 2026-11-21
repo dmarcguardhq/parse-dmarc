@@ -141,6 +141,7 @@ Every setting in this table is an environment variable or a key in `config.json`
 | Maildir deadletter mailbox     | `IMAP_DEADLETTER_BOX`            | `DEADLETTER`                                                 |
 | Database file                  | `DATABASE_PATH`                  | `~/.parse-dmarc/db.sqlite`, `/data/parse-dmarc.db` in Docker |
 | HTTP listen                    | `SERVER_HOST`, `SERVER_PORT`     | `127.0.0.1`, `8080`, `0.0.0.0` in Docker                     |
+| Origins that may call the API  | `CORS_ALLOWED_ORIGINS`           | unset: no CORS headers                                       |
 | Seconds between fetches        | `FETCH_INTERVAL`                 | `300`                                                        |
 | Log level                      | `LOG_LEVEL`                      | `info`                                                       |
 
@@ -169,7 +170,7 @@ On a host that already receives the reports, point `MAILDIR_PATH` at the Maildir
 
 `parse-dmarc --mcp` exposes the same data to an AI assistant over the Model Context Protocol: nine tools, from `get_statistics` to `parse_dmarc_report`, over stdio or HTTP with optional OAuth2. Setup and the tool list are in [docs/MCP.md](docs/MCP.md).
 
-The HTTP API behind the dashboard is five `GET` routes: `/api/statistics`, `/api/reports`, `/api/reports/{id}`, `/api/top-sources` and `/api/version`. None of them has authentication, so keep the port behind your reverse proxy or VPN.
+The HTTP API behind the dashboard is five `GET` routes: `/api/statistics`, `/api/reports`, `/api/reports/{id}`, `/api/top-sources` and `/api/version`. None of them has authentication, so keep the port behind your reverse proxy or VPN. The API sends no CORS headers unless `CORS_ALLOWED_ORIGINS` lists the origins allowed to read it from another origin (comma-separated, or `*`): set it to the dashboard's origin when its settings point it at an API on another host.
 
 To serve the dashboard under a path such as `https://example.com/dmarc/`, have the proxy strip the prefix before forwarding, for example nginx's `location /dmarc/ { proxy_pass http://127.0.0.1:8080/; }` ([full example](contrib/nginx/default.conf)). The dashboard loads its assets and API relative to the page, so it needs no setting of its own.
 

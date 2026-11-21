@@ -122,6 +122,10 @@ One click on a platform, or a template for the self-hosted PaaS you already run.
 | ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------- |
 | **DigitalOcean Droplet** | [![Deploy to DigitalOcean](https://img.shields.io/badge/Deploy-DigitalOcean-0080FF?style=for-the-badge&logo=digitalocean)](./deploy/digitalocean/) | VM with Packer image |
 
+### Kubernetes
+
+The image runs as UID and GID 65532 and writes nothing outside `/data`, so it runs under the `restricted` Pod Security Standard with `readOnlyRootFilesystem: true`: give `/data` a persistent volume with `fsGroup: 65532`. Run one replica per mailbox: two fetchers on one mailbox would read the same mail. A database from an image that ran as root needs its files handed to the new user once, for example `docker run --rm -v parse-dmarc:/data busybox chown -R 65532:65532 /data`.
+
 ## Configuration
 
 Every setting in this table is an environment variable or a key in `config.json`. Environment is read first and the file overrides it. The command-line flags further down take an environment variable but no `config.json` key.

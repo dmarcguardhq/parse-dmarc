@@ -40,16 +40,20 @@ RUN --mount=type=cache,target=/go/pkg/mod \
 
 FROM scratch AS final
 
-VOLUME /data
 ENV PARSE_DMARC_CONFIG=/app/config.json \
     DATABASE_PATH=/data/parse-dmarc.db \
     SERVER_HOST=0.0.0.0
 
 COPY --from=backend-builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=backend-builder /app/parse-dmarc /usr/local/bin/parse-dmarc
-COPY --from=backend-builder --chmod=0777 /data /data
-COPY --from=backend-builder /tmp /tmp
+# The process runs as an unprivileged user and writes only to /data: the
+# database and its write-ahead log. /data is owned by that user so a fresh
+# named volume starts out writable; the root filesystem may be read-only.
+COPY --from=backend-builder --chown=65532:65532 --chmod=0750 /data /data
+COPY --from=backend-builder --chmod=1777 /tmp /tmp
+VOLUME /data
 
+USER 65532:65532
 EXPOSE 8080
 
 ENTRYPOINT ["/usr/local/bin/parse-dmarc"]

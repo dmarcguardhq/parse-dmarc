@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/rs/zerolog"
 	"github.com/urfave/cli/v3"
@@ -45,7 +46,9 @@ func Command(version, commit, date, builtBy string) *cli.Command {
 		EnableShellCompletion: true,
 		Suggest:               true,
 		Before: func(ctx context.Context, c *cli.Command) (context.Context, error) {
-			log = logger.NewLogger("info", false)
+			// LOG_FORMAT applies from the first line, before the
+			// configuration file is read.
+			log, _ = logger.New("info", os.Getenv("LOG_FORMAT"), false)
 			return ctx, nil
 		},
 		Flags: []cli.Flag{

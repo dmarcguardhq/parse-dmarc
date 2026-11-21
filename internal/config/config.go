@@ -22,6 +22,7 @@ var (
 // Config holds the application configuration
 type Config struct {
 	LogLevel    string         `json:"log_level" env:"LOG_LEVEL" envDefault:"info"`
+	LogFormat   string         `json:"log_format" env:"LOG_FORMAT" envDefault:"console"`
 	ColoredLogs bool           `json:"colored_logs" env:"COLORED_LOGS" envDefault:"false"`
 	IMAP        IMAPConfig     `json:"imap"`
 	Maildir     MaildirConfig  `json:"maildir"`

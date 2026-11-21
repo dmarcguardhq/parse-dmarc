@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"time"
@@ -327,6 +328,11 @@ func (s *Storage) GetTopSourceIPs(limit int) ([]TopSourceIP, error) {
 	}
 
 	return results, nil
+}
+
+// Ping checks that the database answers.
+func (s *Storage) Ping(ctx context.Context) error {
+	return s.db.PingContext(ctx)
 }
 
 func (s *Storage) Close() error {

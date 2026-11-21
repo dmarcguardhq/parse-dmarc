@@ -70,10 +70,23 @@ func run(ctx context.Context, version, commit, date string) error {
 	ctx, stop := signal.NotifyContext(ctx, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
-	server := api.NewServer(store, cfg.Server.Host, cfg.Server.Port, m, log, api.VersionInfo{Version: version, Commit: commit, Date: date})
+	server := api.NewServer(store, cfg.Server.Host, cfg.Server.Port, m, log,
+		api.VersionInfo{Version: version, Commit: commit, Date: date},
+		api.WithShutdownTimeout(time.Duration(cfg.Server.ShutdownTimeoutSeconds)*time.Second))
 	serverErrChan := make(chan error, 1)
 	go func() {
 		serverErrChan <- server.Start(ctx)
+	}()
+	// The store closes after the server has drained: wait for Start on
+	// every way out once it is running.
+	serverDone := false
+	defer func() {
+		stop()
+		if !serverDone {
+			if err := <-serverErrChan; err != nil {
+				log.Error().Err(err).Msg("server shutdown")
+			}
+		}
 	}()
 
 	// Refresh metrics on startup
@@ -85,6 +98,7 @@ func run(ctx context.Context, version, commit, date string) error {
 		case <-ctx.Done():
 			log.Info().Msg("shutting down")
 		case err := <-serverErrChan:
+			serverDone = true
 			if err != nil {
 				return fmt.Errorf("server error: %w", err)
 			}
@@ -122,9 +136,11 @@ func run(ctx context.Context, version, commit, date string) error {
 			log.Info().Msg("shutting down")
 			return nil
 		case err := <-serverErrChan:
+			serverDone = true
 			if err != nil {
 				return fmt.Errorf("server error: %w", err)
 			}
+			return nil
 		}
 	}
 }

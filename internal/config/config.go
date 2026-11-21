@@ -78,7 +78,10 @@ const DefaultServerHost = "127.0.0.1"
 
 // ServerConfig holds web server configuration
 type ServerConfig struct {
-	Port int `json:"port" env:"SERVER_PORT" envDefault:"8080"`
+	// ShutdownTimeoutSeconds bounds how long in-flight requests may finish
+	// once the process is asked to stop.
+	ShutdownTimeoutSeconds int `json:"shutdown_timeout_seconds" env:"SHUTDOWN_TIMEOUT_SECONDS" envDefault:"10"`
+	Port                   int `json:"port" env:"SERVER_PORT" envDefault:"8080"`
 	// Host is omitted from a sample config on purpose: the JSON file overrides
 	// the environment, so pinning it there would silently beat SERVER_HOST.
 	Host string `json:"host,omitempty" env:"SERVER_HOST" envDefault:""`
@@ -152,6 +155,9 @@ func Load(path string) (*Config, error) {
 	}
 	if cfg.Server.Port == 0 {
 		cfg.Server.Port = 8080
+	}
+	if cfg.Server.ShutdownTimeoutSeconds <= 0 {
+		cfg.Server.ShutdownTimeoutSeconds = 10
 	}
 	if cfg.Server.Host == "" {
 		cfg.Server.Host = DefaultServerHost

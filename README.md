@@ -142,7 +142,10 @@ Every setting in this table is an environment variable or a key in `config.json`
 | Database file                  | `DATABASE_PATH`                  | `~/.parse-dmarc/db.sqlite`, `/data/parse-dmarc.db` in Docker |
 | HTTP listen                    | `SERVER_HOST`, `SERVER_PORT`     | `127.0.0.1`, `8080`, `0.0.0.0` in Docker                     |
 | Seconds between fetches        | `FETCH_INTERVAL`                 | `300`                                                        |
+| Seconds to drain on shutdown   | `SHUTDOWN_TIMEOUT_SECONDS`       | `10`                                                         |
 | Log level                      | `LOG_LEVEL`                      | `info`                                                       |
+
+On `SIGTERM` or `SIGINT` the HTTP server stops accepting connections and gives in-flight requests `SHUTDOWN_TIMEOUT_SECONDS` to finish; only then is the database closed.
 
 The dashboard listens on loopback unless `SERVER_HOST` says otherwise. Set `SERVER_HOST=0.0.0.0` to reach it from another host; the container images already do, since Docker forwards the port to the container's interface rather than its loopback. A `server.host` in the config file overrides `SERVER_HOST`, which is why the sample config leaves the key out.
 

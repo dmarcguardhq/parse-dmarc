@@ -48,6 +48,9 @@ type IMAPConfig struct {
 	// TLSCAFile; this leaves the connection open to interception.
 	TLSSkipVerify bool `json:"tls_skip_verify" env:"IMAP_TLS_SKIP_VERIFY"`
 
+	// TimeoutSeconds bounds the connection and each IMAP command.
+	TimeoutSeconds int `json:"timeout_seconds" env:"IMAP_TIMEOUT_SECONDS" envDefault:"60"`
+
 	MarkAsSeen       bool   `json:"mark_as_seen" env:"IMAP_MARK_AS_SEEN" envDefault:"true"`
 	ProcessedMailbox string `json:"processed_mailbox" env:"IMAP_PROCESSED_MAILBOX"`
 }

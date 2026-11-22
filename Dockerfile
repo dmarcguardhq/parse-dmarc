@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM oven/bun:1 AS frontend-builder
+FROM oven/bun:1@sha256:3aa040e5445efa09d75bb428a64ba50db13e2b3ac9b6b0c7f145615f62b2ee18 AS frontend-builder
 
 WORKDIR /build/frontend
 
@@ -11,7 +11,7 @@ RUN --mount=type=bind,source=package.json,target=package.json \
 COPY . .
 RUN bun run build
 
-FROM golang:1.27 AS mod
+FROM golang:1.27@sha256:205c7636d74e0ffbe3d007162df7d74f859f5a8c8322dfb9f907977686c126cf AS mod
 
 WORKDIR /app
 
@@ -20,7 +20,7 @@ RUN --mount=type=bind,source=go.mod,target=go.mod \
     --mount=type=cache,target=/go/pkg/mod \
     go mod download
 
-FROM golang:1.27 AS backend-builder
+FROM golang:1.27@sha256:205c7636d74e0ffbe3d007162df7d74f859f5a8c8322dfb9f907977686c126cf AS backend-builder
 
 ARG VERSION=dev
 ARG COMMIT=none

@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/oxc-project/mirrors-oxlint
-    rev: 7dd3561befb509e9e1c326758bc6071875d9fd1b # frozen: v1.51.0
+    rev: 50c9254f606c6121317d2290079442d162224224 # frozen: v1.92.0
     hooks:
       - id: oxlint
         verbose: false
@@ -61,7 +61,7 @@ repos:
             renovate.json
           )$
   - repo: https://github.com/alessandrojcm/commitlint-pre-commit-hook
-    rev: 1f6454da22d006d5bb0d2e65c96c43c23c8a534f # frozen: v9.24.0
+    rev: 1f1ac45c93d1c2ce36b71330252c489a5f4f2724 # frozen: v9.27.0
     hooks:
       - id: commitlint
         language: node
@@ -83,11 +83,11 @@ repos:
       # - id: go-build
       - id: go-mod-tidy
   - repo: https://github.com/rhysd/actionlint
-    rev: 393031adb9afb225ee52ae2ccd7a5af5525e03e8 # frozen: v1.7.11
+    rev: 914e7df21a07ef503a81201c76d2b11c789d3fca # frozen: v1.7.12
     hooks:
       - id: actionlint
   - repo: https://github.com/reteps/dockerfmt
-    rev: 21be1f69cec5e77953bdb40a2f1d95de0eeb56ac # frozen: v0.3.9
+    rev: d096f3231fc6eadc7009f63ee6cdc913b626e9ad # frozen: v0.6.0
     hooks:
       - id: dockerfmt
         args:

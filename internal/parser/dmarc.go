@@ -5,13 +5,20 @@ import (
 	"bytes"
 	"compress/gzip"
 	"encoding/xml"
+	"errors"
 	"fmt"
 	"io"
 	"strings"
 	"time"
 )
 
-// Feedback represents the root DMARC aggregate report structure (RFC 7489)
+// SchemaNamespace2 is the XML namespace of RFC 9990 aggregate reports. RFC
+// 7489 reports carry no namespace.
+const SchemaNamespace2 = "urn:ietf:params:xml:ns:dmarc-2.0"
+
+// Feedback represents the root DMARC aggregate report structure (RFC 7489,
+// RFC 9990). The element names match in both schemas; XMLName.Space tells
+// them apart.
 type Feedback struct {
 	XMLName         xml.Name        `xml:"feedback"`
 	Version         string          `xml:"version"`
@@ -28,6 +35,8 @@ type ReportMetadata struct {
 	ReportID         string    `xml:"report_id"`
 	DateRange        DateRange `xml:"date_range"`
 	Errors           []string  `xml:"error,omitempty"`
+	// Generator names the software that wrote the report (RFC 9990).
+	Generator string `xml:"generator,omitempty"`
 }
 
 // DateRange specifies the time range for the report
@@ -43,8 +52,12 @@ type PolicyPublished struct {
 	ASPF   string `xml:"aspf,omitempty"`  // SPF alignment mode (r=relaxed, s=strict)
 	P      string `xml:"p"`               // Policy (none, quarantine, reject)
 	SP     string `xml:"sp,omitempty"`    // Subdomain policy
-	PCT    int    `xml:"pct,omitempty"`   // Percentage of messages to filter
+	PCT    int    `xml:"pct,omitempty"`   // Percentage of messages to filter (RFC 7489 only)
 	FO     string `xml:"fo,omitempty"`    // Failure reporting options
+	// RFC 9990 additions.
+	NP              string `xml:"np,omitempty"`               // Non-existent subdomain policy
+	DiscoveryMethod string `xml:"discovery_method,omitempty"` // psl or treewalk
+	Testing         string `xml:"testing,omitempty"`          // y: the policy is in test mode
 }
 
 // Record represents a single record in the aggregate report
@@ -98,30 +111,167 @@ type DKIMResult struct {
 
 // SPFResult represents SPF authentication result
 type SPFResult struct {
-	Domain string `xml:"domain"`
-	Scope  string `xml:"scope,omitempty"` // helo, mfrom
-	Result string `xml:"result"`          // none, neutral, pass, fail, softfail, temperror, permerror
+	Domain      string `xml:"domain"`
+	Scope       string `xml:"scope,omitempty"` // helo, mfrom
+	Result      string `xml:"result"`          // none, neutral, pass, fail, softfail, temperror, permerror
+	HumanResult string `xml:"human_result,omitempty"`
 }
 
-// ParseReport parses a DMARC aggregate report from raw data
+// ParseReport parses a DMARC aggregate report from raw data: XML, or XML in
+// a gzip or zip container.
 func ParseReport(data []byte) (*Feedback, error) {
+	return parseDMARC(data, time.Now())
+}
+
+func parseDMARC(data []byte, now time.Time) (*Feedback, error) {
+	decompressed, err := decompress(data)
+	if err != nil {
+		return nil, err
+	}
+	return parseFeedbackXML(decompressed, now)
+}
+
+func parseFeedbackXML(doc []byte, now time.Time) (*Feedback, error) {
+	var feedback Feedback
+	if err := xml.Unmarshal(doc, &feedback); err != nil {
+		return nil, fmt.Errorf("XML parsing failed: %w", err)
+	}
+	feedback.normalize()
+	if err := feedback.validate(now); err != nil {
+		return nil, err
+	}
+	return &feedback, nil
+}
+
+var utf8BOM = []byte{0xef, 0xbb, 0xbf}
+
+// decompress returns the report document inside data, bounded by
+// maxDecompressedSize.
+func decompress(data []byte) ([]byte, error) {
 	// A raw (uncompressed) report gets the same ceiling as a decompressed one.
 	if len(data) > maxDecompressedSize {
 		return nil, errReportTooLarge
 	}
-
-	// Try to decompress if needed
 	decompressed, err := tryDecompress(data)
 	if err != nil {
 		return nil, fmt.Errorf("decompression failed: %w", err)
 	}
+	// Neither encoding/xml nor encoding/json accepts a byte order mark,
+	// which some reporters write.
+	return bytes.TrimPrefix(decompressed, utf8BOM), nil
+}
 
-	var feedback Feedback
-	if err := xml.Unmarshal(decompressed, &feedback); err != nil {
-		return nil, fmt.Errorf("XML parsing failed: %w", err)
+// SchemaVersion is "2.0" for an RFC 9990 report and the report's own
+// <version> (or "draft" when it has none) otherwise.
+func (f *Feedback) SchemaVersion() string {
+	if f.XMLName.Space == SchemaNamespace2 {
+		return "2.0"
+	}
+	if f.Version != "" {
+		return f.Version
+	}
+	return "draft"
+}
+
+// normalize evens out what reporters disagree on, so the same outcome is
+// stored and counted the same way: result words in lower case, a missing
+// org_name taken from the reporter's address, a missing envelope_from taken
+// from the SPF domain that was checked.
+func (f *Feedback) normalize() {
+	md := &f.ReportMetadata
+	md.OrgName = strings.TrimSpace(md.OrgName)
+	md.ReportID = strings.Trim(strings.TrimSpace(md.ReportID), "<>")
+	if md.OrgName == "" {
+		if _, domain, ok := strings.Cut(md.Email, "@"); ok {
+			md.OrgName = strings.ToLower(strings.TrimSpace(domain))
+		}
 	}
 
-	return &feedback, nil
+	pp := &f.PolicyPublished
+	pp.Domain = strings.ToLower(strings.TrimSpace(pp.Domain))
+	pp.P = lowerTrim(pp.P)
+	pp.SP = lowerTrim(pp.SP)
+	pp.NP = lowerTrim(pp.NP)
+	pp.ADKIM = lowerTrim(pp.ADKIM)
+	pp.ASPF = lowerTrim(pp.ASPF)
+	pp.DiscoveryMethod = lowerTrim(pp.DiscoveryMethod)
+	pp.Testing = lowerTrim(pp.Testing)
+
+	for i := range f.Records {
+		r := &f.Records[i]
+		r.Row.SourceIP = strings.TrimSpace(r.Row.SourceIP)
+		pe := &r.Row.PolicyEvaluated
+		pe.Disposition = lowerTrim(pe.Disposition)
+		pe.DKIM = lowerTrim(pe.DKIM)
+		pe.SPF = lowerTrim(pe.SPF)
+		for j := range pe.Reason {
+			pe.Reason[j].Type = lowerTrim(pe.Reason[j].Type)
+		}
+
+		id := &r.Identifiers
+		id.HeaderFrom = strings.ToLower(strings.TrimSpace(id.HeaderFrom))
+		id.EnvelopeFrom = strings.ToLower(strings.TrimSpace(id.EnvelopeFrom))
+		id.EnvelopeTo = strings.ToLower(strings.TrimSpace(id.EnvelopeTo))
+
+		for j := range r.AuthResults.DKIM {
+			d := &r.AuthResults.DKIM[j]
+			d.Domain = strings.ToLower(strings.TrimSpace(d.Domain))
+			d.Result = lowerTrim(d.Result)
+		}
+		for j := range r.AuthResults.SPF {
+			sr := &r.AuthResults.SPF[j]
+			sr.Domain = strings.ToLower(strings.TrimSpace(sr.Domain))
+			sr.Scope = lowerTrim(sr.Scope)
+			sr.Result = lowerTrim(sr.Result)
+		}
+		if id.EnvelopeFrom == "" && len(r.AuthResults.SPF) > 0 {
+			id.EnvelopeFrom = r.AuthResults.SPF[len(r.AuthResults.SPF)-1].Domain
+		}
+	}
+}
+
+func lowerTrim(s string) string {
+	return strings.ToLower(strings.TrimSpace(s))
+}
+
+// Bounds on a report's date range: RFC 9990 reports cover at most a day,
+// and a span beyond a year or a date in the future is a broken or forged
+// report that would distort every chart it lands in.
+const (
+	maxReportSpan = 366 * 24 * time.Hour
+	maxFutureSkew = 48 * time.Hour
+)
+
+// ErrInvalidDMARC wraps every reason a well-formed XML document is still not
+// a usable aggregate report.
+var ErrInvalidDMARC = errors.New("invalid DMARC aggregate report")
+
+func (f *Feedback) validate(now time.Time) error {
+	md := f.ReportMetadata
+	switch {
+	case md.OrgName == "":
+		return fmt.Errorf("%w: no org_name or reporter email", ErrInvalidDMARC)
+	case md.ReportID == "":
+		return fmt.Errorf("%w: no report_id", ErrInvalidDMARC)
+	case f.PolicyPublished.Domain == "":
+		return fmt.Errorf("%w: no policy_published domain", ErrInvalidDMARC)
+	}
+	if err := validateDateRange(time.Unix(md.DateRange.Begin, 0), time.Unix(md.DateRange.End, 0), now); err != nil {
+		return fmt.Errorf("%w: %w", ErrInvalidDMARC, err)
+	}
+	return nil
+}
+
+func validateDateRange(begin, end, now time.Time) error {
+	switch {
+	case end.Before(begin):
+		return errors.New("date range ends before it begins")
+	case end.Sub(begin) > maxReportSpan:
+		return fmt.Errorf("date range spans more than %d days", int(maxReportSpan.Hours()/24))
+	case begin.After(now.Add(maxFutureSkew)), end.After(now.Add(maxFutureSkew)):
+		return errors.New("date range is in the future")
+	}
+	return nil
 }
 
 // tryDecompress attempts to decompress data (gzip or zip). Detection is

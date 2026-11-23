@@ -18,6 +18,7 @@ const sampleReport = `<?xml version="1.0"?>
     <org_name>example.com</org_name>
     <report_id>abc123</report_id>
   </report_metadata>
+  <policy_published><domain>example.com</domain><p>none</p></policy_published>
   <record></record>
 </feedback>`
 

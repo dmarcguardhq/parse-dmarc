@@ -1,5 +1,26 @@
 # Changelog
 
+## [1.7.4](https://github.com/dmarcguardhq/parse-dmarc/compare/v1.7.3...v1.7.4) (2026-11-25)
+
+
+### Build & Dependencies
+
+* **deps:** pin dependencies ([#260](https://github.com/dmarcguardhq/parse-dmarc/issues/260)) ([ee1a178](https://github.com/dmarcguardhq/parse-dmarc/commit/ee1a1782e9a98cb92795239a756979f425af8925))
+* **deps:** update module github.com/goccy/go-json to v0.12.0 ([#269](https://github.com/dmarcguardhq/parse-dmarc/issues/269)) ([33cb129](https://github.com/dmarcguardhq/parse-dmarc/commit/33cb1296947cf32d122416174d5bff46ed8bdb58))
+* **deps:** update module modernc.org/sqlite to v1.62.0 ([#252](https://github.com/dmarcguardhq/parse-dmarc/issues/252)) ([c1b7953](https://github.com/dmarcguardhq/parse-dmarc/commit/c1b7953b4d68d1a70373f7cc0ac9a334856ad7b2))
+* **deps:** update nginx docker tag to v1.31.7 ([#253](https://github.com/dmarcguardhq/parse-dmarc/issues/253)) ([f85415c](https://github.com/dmarcguardhq/parse-dmarc/commit/f85415cdf3b273e8a590a9cacdd2f2ea30f45ae6))
+* **deps:** update pre-commit hooks ([#270](https://github.com/dmarcguardhq/parse-dmarc/issues/270)) ([51ce9ab](https://github.com/dmarcguardhq/parse-dmarc/commit/51ce9ab3bb4c6f7505e7befb57078308b8dbb6de))
+
+
+### Chores
+
+* **deps:** lock file maintenance ([#251](https://github.com/dmarcguardhq/parse-dmarc/issues/251)) ([e862d64](https://github.com/dmarcguardhq/parse-dmarc/commit/e862d64f2c2435eb441ab905b0d5512e359e951f))
+
+
+### CI
+
+* pin pre-commit hooks and CI tool versions ([#257](https://github.com/dmarcguardhq/parse-dmarc/issues/257)) ([c264d8e](https://github.com/dmarcguardhq/parse-dmarc/commit/c264d8e664bc023fdbb8c63bc88636b0408f3338))
+
 ## [1.7.3](https://github.com/dmarcguardhq/parse-dmarc/compare/v1.7.2...v1.7.3) (2026-11-08)
 
 
